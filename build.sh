@@ -5,7 +5,7 @@ export PATH="$PATH:/c/Python39"
 
 SDK_PATH=$PWD
 FW_PRJ_PATH=_bld_script
-FW_PRJ_NAME=qst_evk
+FW_PRJ_NAME=bleGsensor
 
 
 echo "=============================================================================="
