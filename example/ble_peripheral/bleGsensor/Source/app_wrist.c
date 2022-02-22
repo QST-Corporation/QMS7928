@@ -69,6 +69,8 @@
     MACROS
 */
 
+#define DEF_BOARD_QST_EVK                     1
+
 // Convert BPM to RR-Interval for data simulation purposes
 #define HEARTRATE_BPM_TO_RR(bpm)              ((uint16) 60 * 1024 / (uint16) (bpm))
 
@@ -211,20 +213,44 @@ static gapRolesCBs_t WristPeripheralCB =
 //  NULL                    // Pairing state callback
 //};
 
-#define GPIO_GREEN    P31
-#define GPIO_BLUE     P33
-#define GPIO_RED      P32
+#ifdef DEF_BOARD_QST_EVK
 
+  #define GPIO_GREEN    P0
+  #define GPIO_BLUE     P1
+  #define GPIO_RED      P27
+  #define KEY1          P11
+  #define KEY2          P14
+  //char* ledStr[4] = {"led_none","led5","led3","led4"};
+#else
+  #define GPIO_GREEN    P31
+  #define GPIO_BLUE     P33
+  #define GPIO_RED      P32
+  #define KEY1          P14
+  #define KEY2          P15
+  //char* ledStr[4] = {"led_none","red","green","blue"};
+#endif
 static gpio_pin_e led_pins[3] = {GPIO_GREEN,GPIO_BLUE,GPIO_RED};
 
 static void light_timeout_handler(void)
 {
+#ifdef DEF_BOARD_QST_EVK
+    static uint8_t led = 0;
+    uint8_t i;
+    for(i=0;i<sizeof(led_pins);i++)
+    {
+      hal_gpio_write(led_pins[i], (i==led?0:1));
+    }
+    if(++led == sizeof(led_pins)) {
+      led = 0;
+    }
+#else
     static light_color_t color = LIGHT_COLOR_OFF;
 
     light_color_quickSet(color);
     if(++color == LIGHT_COLOR_NUM) {
       color = LIGHT_COLOR_OFF;
     }
+#endif
 }
 
 void appWristInit( uint8 task_id )

@@ -65,35 +65,16 @@
 /******************************************************
  *                      Macros
  ******************************************************/
-#define QMA6100_IIC_TIMEOUT           500
-#define QMA6100_SPI_TIMEOUT           500
-
 #define qma6100_printf                LOG
 #define QMA6100_USE_IIC               true//true: I2C, false: SPI
 #define QMA6100_SPI_DMA               false//true: SPI_DMA, false: SPI_IT
-//extern uint32_t system_ticks;
-
-enum {
-  SPI_WAIT,
-  TX_COMPLETE,
-  TXRX_COMPLETE,
-  RX_COMPLETE,
-  SPI_ERROR
-};
-
 
 /******************************************************
  *                 Global Variables
  ******************************************************/
-#if (QMA6100_SPI_DMA)
-DMA_RAM_ATTR uint8_t SpiTxData[50] = {0,};
-DMA_RAM_ATTR uint8_t SpiRxData[50] = {0,};
-#else
 uint8_t SpiTxData[50] = {0,};
 uint8_t SpiRxData[50] = {0,};
-#endif
 
-extern void Error_Handler(void);
 /******************************************************
  *                 Static Variables
  ******************************************************/
@@ -112,10 +93,8 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type);
   */
 static void qma6100_i2c_init(const qma6100_if_handle_t *p_if)
 {
-  int debug_ret;
-
   /* NOTE: the I2C pins must be pull-up outside, or it cannot issue out correct waveform. */
-  debug_ret = hal_i2c_pin_init(I2C_0, p_if->pin.sda, p_if->pin.scl);
+  hal_i2c_pin_init(I2C_0, p_if->pin.sda, p_if->pin.scl);
   g_pi2c = hal_i2c_init(I2C_0,(I2C_CLOCK_e)p_if->speed);
 }
 
@@ -152,11 +131,11 @@ static void qma6100_if_init(const qma6100_if_handle_t *p_if)
 #endif
 
   if (p_if->pin.int1 != GPIO_DUMMY) {
-    hal_gpio_init();
+    //hal_gpio_init();
     hal_gpioin_register(p_if->pin.int1, qma6100_int1_handler, NULL);
   }
   if (p_if->pin.int2 != GPIO_DUMMY) {
-    hal_gpio_init();
+    //hal_gpio_init();
     hal_gpioin_register(p_if->pin.int2, qma6100_int2_handler, NULL);
   }
 }
@@ -195,74 +174,19 @@ static int qma6100_i2c_write(uint8_t reg, uint8_t *pData, uint8_t size)
 
 #else
 
-static HAL_StatusTypeDef qma6100_spi_read(uint8_t reg, uint8_t *pData, uint16_t size)
+static int qma6100_spi_read(uint8_t reg, uint8_t *pData, uint16_t size)
 {
-  HAL_StatusTypeDef Status;
+  int ret;
 
-  if(size > (sizeof(SpiRxData)-1))
-  {
-    qma6100_printf("SPI read buffer overflow\n");
-    return HAL_INVALIAD_PARAM;
-  }
 
-  memset(SpiRxData, 0x00, sizeof(SpiRxData));
-  memset(SpiTxData, 0x00, sizeof(SpiTxData));
-  io_write_pin(PB13,0);//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-  DELAY_US(30);
-  spiState = SPI_WAIT;
-
-  SpiTxData[0] = reg|0x80; //bit[7] = 1 for SPI read
-  //qma6100_printf("SPI read 0x%X, len %d\n", SpiTxData[0], size+1);
-#if (QMA6100_SPI_DMA)
-  Status = HAL_SPI_TransmitReceive_DMA(&SpiHandle, SpiTxData, SpiRxData, size+1);
-#else
-  Status = HAL_SPI_TransmitReceive_IT(&SpiHandle, SpiTxData, SpiRxData, size+1);
-#endif
-  // Status = HAL_SPI_Transmit_DMA(&SpiHandle, SpiTxData, 1);
-  // while(spiState == SPI_WAIT){}
-  // spiState = SPI_WAIT;
-  // Status = HAL_SPI_Receive_DMA(&SpiHandle, SpiRxData, size);
-
-  while(spiState == SPI_WAIT){}
-  DELAY_US(50);
-  //while((spiState != TXRX_COMPLETE)&&(spiState != RX_COMPLETE)){}
-  qma6100_printf("SPI state %d, rx: [0]0x%X, [1]0x%X\n", spiState, SpiRxData[0], SpiRxData[1]);
-  memmove(pData, &SpiRxData[1], size);//memmove(pData, &SpiRxData[1], size);
-
-  io_write_pin(PB13,1);//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-  //DELAY_US(10);
-  return Status;
+  return ret;
 }
 
-static HAL_StatusTypeDef qma6100_spi_write(uint8_t reg, uint8_t *pData, uint16_t size)
+static int qma6100_spi_write(uint8_t reg, uint8_t *pData, uint16_t size)
 {
-  HAL_StatusTypeDef Status;
+  int ret;
 
-  if(size > (sizeof(SpiTxData)-1))
-  {
-    qma6100_printf("SPI write buffer overflow\n");
-    return HAL_INVALIAD_PARAM;
-  }
-
-  io_write_pin(PB13,0);//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-  DELAY_US(30);
-  spiState = SPI_WAIT;
-
-  memset(SpiTxData, 0x00, sizeof(SpiTxData));
-  SpiTxData[0] = reg&0x7F; //bit[7] = 0 for SPI write
-  memmove(&SpiTxData[1], pData, size);
-#if (QMA6100_SPI_DMA)
-  Status = HAL_SPI_Transmit_DMA(&SpiHandle, SpiTxData, size+1);
-#else
-  Status = HAL_SPI_Transmit_IT(&SpiHandle, SpiTxData, size+1);
-#endif
-
-  while(spiState == SPI_WAIT){}
-  qma6100_printf("SPI write state 0x%X\n", spiState);
-  DELAY_US(10);
-  io_write_pin(PB13,1);//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-  //DELAY_US(10);
-  return Status;
+  return ret;
 }
 #endif
 
@@ -930,6 +854,18 @@ void get_dieID_WaferID(void)
   qma6100_printf("waferID=0x%x\n", waferid);
 }
 
+static bool qma6100_int_is_disabled(void)
+{
+  uint8_t regVal[3] = {0,};
+  uint16_t intEnReg = 0;
+  bool intIsDisabled = false;
+  qma6100_read_multi_byte(0x16,regVal,3);
+  intEnReg = regVal[0] + regVal[1] +regVal[2];
+  qma6100_printf("intEn:%d\n",intEnReg);
+  intIsDisabled = intEnReg>0?false:true;
+  return intIsDisabled;
+}
+
 static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 {
   uint8_t reg, reg_read;
@@ -1022,7 +958,10 @@ ret_code_t qma6100_init(qma6100_device_t* p_dev)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_deinit(p_dev->hw_if);
+  if(qma6100_int_is_disabled() || \
+    ((p_dev->hw_if->pin.int1 == GPIO_DUMMY)&&(p_dev->hw_if->pin.int2 == GPIO_DUMMY))){
+    qma6100_i2c_deinit(p_dev->hw_if);
+  }
 #endif
   return ret;
 }
@@ -1061,7 +1000,9 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   uint8_t int_status[3];
   //int16_t Xvalue,Yvalue,Zvalue;
   static uint16_t int1cnt = 0;
+  static uint16_t logcnt = 0;
   qma6100_device_t* p_dev = get_qma6100_handle();
+  //qma6100_ev_t qma6100_evt;
 
   if (!p_dev->initialized) {
       qma6100_printf("\nInt1: QMA6100P has not been initialized.\n");
@@ -1069,21 +1010,28 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_init(p_dev->hw_if);
+  //qma6100_i2c_init(p_dev->hw_if);
 #endif
 
   int1cnt++;
   qma6100_read_multi_byte(0x09, int_status,3);
-  qma6100_printf("Int1 cnt=%d,state[0x%x,0x%x,0x%x]\n",int1cnt,int_status[0],int_status[1],int_status[2]);
+  //qma6100_printf("Int1 cnt=%d,state[0x%x,0x%x,0x%x]\n",int1cnt,int_status[0],int_status[1],int_status[2]);
 
   qma6100_read_multi_byte(0x01,rawdata,6);
-  rdata[0][0] = (int16_t)(((unsigned short)rawdata[1] << 8) + (unsigned short)rawdata[0]);
-  rdata[0][1] = (int16_t)(((unsigned short)rawdata[3] << 8) + (unsigned short)rawdata[2]);
-  rdata[0][2] = (int16_t)(((unsigned short)rawdata[5] << 8) + (unsigned short)rawdata[4]);
-  qma6100_printf("Raw:    %d, %d, %d\n\n",rdata[0][0],rdata[0][1],rdata[0][2]);
+  rdata[0][0] = (int16_t)(((unsigned short)rawdata[1]<<8) + (unsigned short)rawdata[0])>>2;
+  rdata[0][1] = (int16_t)(((unsigned short)rawdata[3]<<8) + (unsigned short)rawdata[2])>>2;
+  rdata[0][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4])>>2;
+  if (++logcnt > 99) {
+    logcnt = 0;
+    qma6100_printf("Raw:  %4d, %4d, %4d\n",rdata[0][0],rdata[0][1],rdata[0][2]);
+    //qma6100_evt.ev = rawdata_event;
+    //qma6100_evt.size = 3*sizeof(int16_t);
+    //qma6100_evt.data = &rdata[0][0];
+    //p_dev->evt_hdl(&qma6100_evt);
+  }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_deinit(p_dev->hw_if);
+  //qma6100_i2c_deinit(p_dev->hw_if);
 #endif
 }
 
@@ -1107,7 +1055,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_init(p_dev->hw_if);
+  //qma6100_i2c_init(p_dev->hw_if);
 #endif
 
   int2cnt++;
@@ -1132,11 +1080,10 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   else if((rawdatass[2]&0x10)==0x10)
   {
     qma6100_read_multi_byte(0x1,rawdata,6);// equals to qma6100_read_multi_byte(0x3f,rawdata,6);
-    rdata[0][0] = (int16_t)(((unsigned short)rawdata[1] << 8) + (unsigned short)rawdata[0])>>2;
-    rdata[0][1] = (int16_t)(((unsigned short)rawdata[3] << 8) + (unsigned short)rawdata[2])>>2;
-    rdata[0][2] = (int16_t)(((unsigned short)rawdata[5] << 8) + (unsigned short)rawdata[4])>>2;
+    rdata[0][0] = (int16_t)(((unsigned short)rawdata[1]<<8) + (unsigned short)rawdata[0])>>2;
+    rdata[0][1] = (int16_t)(((unsigned short)rawdata[3]<<8) + (unsigned short)rawdata[2])>>2;
+    rdata[0][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4])>>2;
     qma6100_printf("Port2:%d: %5d, %5d, %5d\n",int2cnt,rdata[0][0],rdata[0][1],rdata[0][2]);
-    goto _exit;
   }
   else if((rawdatass[2]&0x60)!=0x0)
   {
@@ -1153,22 +1100,23 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
     qma6100_printf("Port2-:cnt=%d,cnt1=%d,Datarow=%d\n",readbytes,cnt1,nbytes);
 
     qma6100_read_multi_byte(0x3f,rawdata,readbytes);
-    if(cnt1!=0)
-    qma6100_read_multi_byte(0x3f,&rawdata[240],cnt1);
-    // platform don't support 384 bytes one time , so read it twice . Per your platform , you can read it in one cycle.
+    if(cnt1!=0) {
+      qma6100_read_multi_byte(0x3f,&rawdata[240],cnt1);
+      // platform don't support 384 bytes one time , so read it twice . Per your platform , you can read it in one cycle.
+    }
 
 
     for(i=0;i<(cntforint);i++)//(cnt+cnt1)/6
     {
 #if 1
       for(j=0;j<nbytes;j++)
-      rdata[i][j] = (int16_t)(((unsigned short)rawdata[(1+j*2)+nbytes*2*i] << 8) + (unsigned short)rawdata[(0+j*2)+nbytes*2*i]);
-      //rdata[i][1] = (int16_t)(((unsigned short)rawdata[3+nbytes*2*i] << 8) + (unsigned short)rawdata[2+nbytes*2*i]);
-      //rdata[i][2] = (int16_t)(((unsigned short)rawdata[5+nbytes*2*i] << 8) + (unsigned short)rawdata[4+nbytes*2*i]);	
+      rdata[i][j] = (int16_t)(((unsigned short)rawdata[(1+j*2)+nbytes*2*i]<<8) + (unsigned short)rawdata[(0+j*2)+nbytes*2*i]);
+      //rdata[i][1] = (int16_t)(((unsigned short)rawdata[3+nbytes*2*i]<<8) + (unsigned short)rawdata[2+nbytes*2*i]);
+      //rdata[i][2] = (int16_t)(((unsigned short)rawdata[5+nbytes*2*i]<<8) + (unsigned short)rawdata[4+nbytes*2*i]);	
 #else
-      rdata[i][0] = (int16_t)(((unsigned short)rawdata[1] << 8) + (unsigned short)rawdata[0]);
-      rdata[i][1] = (int16_t)(((unsigned short)rawdata[3] << 8) + (unsigned short)rawdata[2]);
-      rdata[i][2] = (int16_t)(((unsigned short)rawdata[5] << 8) + (unsigned short)rawdata[4]);	
+      rdata[i][0] = (int16_t)(((unsigned short)rawdata[1]<<8) + (unsigned short)rawdata[0]);
+      rdata[i][1] = (int16_t)(((unsigned short)rawdata[3]<<8) + (unsigned short)rawdata[2]);
+      rdata[i][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4]);	
 #endif	
     }
     for(i=0;i<(cntforint);i++)
@@ -1189,13 +1137,12 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
     qma6100_printf("Port2: clr state\n");
   }
 
-_exit:
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_deinit(p_dev->hw_if);
+  //qma6100_i2c_deinit(p_dev->hw_if);
 #endif
 }
 
-void qma6100_demo(void)
+void qma6100_demo(void)//qma6100_evt_hdl_t evt_hdl)
 {
   qma6100_device_t* p_dev = get_qma6100_handle();
   //int16_t Acc[3] = {0x00,};
@@ -1204,6 +1151,7 @@ void qma6100_demo(void)
   {
     qma6100_printf("\n\nQMA6100P demo\n");
     if (qma6100_init(p_dev) == QMA_SUCCESS) {
+      //p_dev->evt_hdl = evt_hdl;
       qma6100_printf("QMA6100P is initialized!\n\n");
     }
   }
@@ -1219,10 +1167,10 @@ const qma6100_if_handle_t qma6100_if_cfg = {
   .speed = i2c_speed_100K,
   .i2c_address = 0x12,  //0x12:AD0 ---GND; 0x13:AD0 ---VDD
   .pin = {
-      .scl = P16,//P34,//P25,
-      .sda = P17,//P33,//P26,
-      .int1 = P18,//GPIO_DUMMY,
-      .int2 = GPIO_DUMMY,//P18,
+      .scl = P23, //P24,P25 cannot be pull-up
+      .sda = P26,
+      .int1 = P2,
+      .int2 = GPIO_DUMMY,
   },
   .read_byte = qma6100_read_byte,
   .read_multi_byte = qma6100_read_multi_byte,
