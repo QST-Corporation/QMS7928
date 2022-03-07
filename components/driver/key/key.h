@@ -51,7 +51,7 @@ extern "C" {
 #include "types.h"
 #include "gpio.h"
 
-#define HAL_KEY_NUM                     1      //config key's number
+#define HAL_KEY_NUM                     2      //config key's number
 #define HAL_KEY_EVENT                   0x4000 //assign short key event in your app event process
 
 #define HAL_KEY_SUPPORT_LONG_PRESS      //if use long key,please enable it

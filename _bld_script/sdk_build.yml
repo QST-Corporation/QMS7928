@@ -78,6 +78,9 @@ fs:
 gpio:
 - example\peripheral\gpio\gpio.uvprojx
 
+qst_evk:
+- example\peripheral\qst_evk\qst_evk.uvprojx
+
 kscan:
 - example\peripheral\kscan\kscan.uvprojx
 
