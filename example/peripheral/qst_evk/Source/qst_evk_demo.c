@@ -53,6 +53,7 @@
 #include "error.h"
 #include "key.h"
 #include "led_light.h"
+#include "qma6100.h"
 
 //#define DEF_BOARD_QST_EVK
 
@@ -234,6 +235,7 @@ static uint8 key_TaskID;
 
 #define KEY_DEMO_ONCE_TIMER      0x0001
 #define KEY_DEMO_CYCLE_TIMER     0x0002
+#define ACC_DATA_EVENT           0x0004
 //#define HAL_KEY_EVENT            0x0100//assign short key event in your app event process
 
 #ifdef HAL_KEY_SUPPORT_LONG_PRESS
@@ -386,6 +388,9 @@ void EVK_Demo_Init(uint8 task_id)
     light_init(led_pins,3);
     osal_start_timerEx(key_TaskID, KEY_DEMO_ONCE_TIMER, 1000);
     osal_start_reload_timer(key_TaskID, KEY_DEMO_CYCLE_TIMER, 1000);
+#ifdef DEF_BOARD_QST_EVK
+    osal_start_reload_timer(key_TaskID, ACC_DATA_EVENT, 1000);
+#endif
 }
 
 uint16 EVK_ProcessEvent( uint8 task_id, uint16 events )
@@ -406,6 +411,12 @@ uint16 EVK_ProcessEvent( uint8 task_id, uint16 events )
     {
         //LOG("recycle timer\n");
         return (events ^ KEY_DEMO_CYCLE_TIMER);
+    }
+
+    if( events & ACC_DATA_EVENT)
+    {
+        qma6100_demo();
+        return ( events ^ ACC_DATA_EVENT);
     }
 
     if( events & HAL_KEY_EVENT)                                                     //do not modify,key will use it

@@ -433,6 +433,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\qst_evk_demo.c</FilePath>
             </File>
+	    <File>
+              <FileName>qma6100.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\qma6100.c</FilePath>
+            </File>
             <File>
               <FileName>qst_evk_Main.c</FileName>
               <FileType>1</FileType>
@@ -467,6 +472,11 @@
               <FileName>uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\components\driver\uart\uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\driver\i2c\i2c.c</FilePath>
             </File>
             <File>
               <FileName>pwrmgr.c</FileName>
