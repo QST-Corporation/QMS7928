@@ -854,6 +854,18 @@ void get_dieID_WaferID(void)
   qma6100_printf("waferID=0x%x\n", waferid);
 }
 
+static bool qma6100_int_is_disabled(void)
+{
+  uint8_t regVal[3] = {0,};
+  uint16_t intEnReg = 0;
+  bool intIsDisabled = false;
+  qma6100_read_multi_byte(0x16,regVal,3);
+  intEnReg = regVal[0] + regVal[1] +regVal[2];
+  qma6100_printf("intEn:%d\n",intEnReg);
+  intIsDisabled = intEnReg>0?false:true;
+  return intIsDisabled;
+}
+
 static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 {
   uint8_t reg, reg_read;
@@ -946,7 +958,10 @@ ret_code_t qma6100_init(qma6100_device_t* p_dev)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_deinit(p_dev->hw_if);
+  if(qma6100_int_is_disabled() || \
+    ((p_dev->hw_if->pin.int1 == GPIO_DUMMY)&&(p_dev->hw_if->pin.int2 == GPIO_DUMMY))){
+    qma6100_i2c_deinit(p_dev->hw_if);
+  }
 #endif
   return ret;
 }
@@ -994,7 +1009,7 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_init(p_dev->hw_if);
+  //qma6100_i2c_init(p_dev->hw_if);
 #endif
 
   int1cnt++;
@@ -1011,7 +1026,7 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_deinit(p_dev->hw_if);
+  //qma6100_i2c_deinit(p_dev->hw_if);
 #endif
 }
 
@@ -1035,7 +1050,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_init(p_dev->hw_if);
+  //qma6100_i2c_init(p_dev->hw_if);
 #endif
 
   int2cnt++;
@@ -1118,7 +1133,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  qma6100_i2c_deinit(p_dev->hw_if);
+  //qma6100_i2c_deinit(p_dev->hw_if);
 #endif
 }
 
