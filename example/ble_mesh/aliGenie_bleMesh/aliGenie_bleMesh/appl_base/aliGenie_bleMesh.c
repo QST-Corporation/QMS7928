@@ -125,7 +125,7 @@ uint8       g_dev_reset_flg;
 //static uint8 scanRspData[B_MAX_ADV_LEN];
 
 // GAP GATT Attributes
-static uint8 attDeviceName[GAP_DEVICE_NAME_LEN] = "PHYPLUS ALI MSH";
+static uint8 attDeviceName[GAP_DEVICE_NAME_LEN] = "QST ALI MSH";
 
 static gapDevDiscReq_t bleMesh_scanparam;
 static gapAdvertisingParams_t bleMesh_advparam;

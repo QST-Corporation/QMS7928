@@ -419,14 +419,14 @@
           <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>OSAL_PhyPlusPhy.c</FileName>
+              <FileName>OSAL_QstPhy.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\source\OSAL_PhyPlusPhy.c</FilePath>
+              <FilePath>.\source\OSAL_QstPhy.c</FilePath>
             </File>
             <File>
-              <FileName>phy_plus_phy.c</FileName>
+              <FileName>qst_phy.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\source\phy_plus_phy.c</FilePath>
+              <FilePath>.\source\qst_phy.c</FilePath>
             </File>
           </Files>
         </Group>

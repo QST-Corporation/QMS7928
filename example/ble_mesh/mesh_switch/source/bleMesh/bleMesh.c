@@ -1,16 +1,16 @@
 /**************************************************************************************************
 
-    Phyplus Microelectronics Limited confidential and proprietary.
+    Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Phyplus Microelectronics
-    Limited ("Phyplus"). Your use of this Software is limited to those
+    IMPORTANT: All rights of this software belong to Shanghai QST 
+    Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
-    of agreements as a customer or a partner of Phyplus. You may not use this
+    of agreements as a customer or a partner of QST. You may not use this
     Software unless you agree to abide by the terms of these agreements.
     You acknowledge that the Software may not be modified, copied,
-    distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy
+    distributed or disclosed unless embedded on a QST Bluetooth Low Energy
     (BLE) integrated circuit, either as a product or is integrated into your
     products.  Other than for the aforementioned purposes, you may not use,
     reproduce, copy, prepare derivative works of, modify, distribute, perform,
@@ -20,7 +20,7 @@
     PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
     INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
     NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-    PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
+    QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
     NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
     LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
     INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
@@ -161,7 +161,7 @@ uint8 bleMesh_TaskID;   // Task ID for internal task/event processing
 //static uint8 scanRspData[B_MAX_ADV_LEN];
 
 // GAP GATT Attributes
-static uint8 attDeviceName[GAP_DEVICE_NAME_LEN] = "PHYPLUS BLE Mesh";
+static uint8 attDeviceName[GAP_DEVICE_NAME_LEN] = "QST BLE Mesh";
 
 static gapDevDiscReq_t bleMesh_scanparam;
 static gapAdvertisingParams_t bleMesh_advparam;

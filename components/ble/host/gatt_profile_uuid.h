@@ -1,16 +1,16 @@
 /**************************************************************************************************
 
-    Phyplus Microelectronics Limited confidential and proprietary.
+    Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Phyplus Microelectronics
-    Limited ("Phyplus"). Your use of this Software is limited to those
+    IMPORTANT: All rights of this software belong to Shanghai QST 
+    Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
-    of agreements as a customer or a partner of Phyplus. You may not use this
+    of agreements as a customer or a partner of QST. You may not use this
     Software unless you agree to abide by the terms of these agreements.
     You acknowledge that the Software may not be modified, copied,
-    distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy
+    distributed or disclosed unless embedded on a QST Bluetooth Low Energy
     (BLE) integrated circuit, either as a product or is integrated into your
     products.  Other than for the aforementioned purposes, you may not use,
     reproduce, copy, prepare derivative works of, modify, distribute, perform,
@@ -20,7 +20,7 @@
     PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
     INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
     NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-    PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
+    QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
     NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
     LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
     INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
@@ -184,7 +184,7 @@ extern "C"
 #define GATT_UNIT_VOLUME_CUBIC_MTR_UUID       0x2711  // m^3, m^3
 #define GATT_UNIT_VELOCITY_MPS_UUID           0x2712  // m/s, m s^-1
 #define GATT_UNIT_ACCELERATION_MPS_SQ_UUID    0x2713  // m/s^2, m s^-2
-#define GATT_UNIT_WAVENUMBER_RM_UUID          0x2714  // ó, m^-1
+#define GATT_UNIT_WAVENUMBER_RM_UUID          0x2714  // Ã³, m^-1
 #define GATT_UNIT_DENSITY_KGPCM_UUID          0x2715  // p, kg m^-3
 #define GATT_UNIT_SURFACE_DENSITY_KGPSM_UUID  0x2716  // pA, kg m^-2
 #define GATT_UNIT_SPECIFIC_VOLUME_CMPKG_UUID  0x2717  // v, m^3 kg^-1
@@ -218,18 +218,18 @@ extern "C"
 #define GATT_UNIT_MASS_TONNE_UUID             0x2768  // t, 10^3 kg
 
 #define GATT_UINT_LENGTH_YARD_UUID            0x27A0  // yd, 0.9144 m
-#define GATT_UNIT_LENGTH_PARSEC_UUID          0x27A1  // pc, 3.085678 × 1016 m
+#define GATT_UNIT_LENGTH_PARSEC_UUID          0x27A1  // pc, 3.085678 Ã— 1016 m
 #define GATT_UNIT_LENGTH_INCH_UUID            0x27A2  // in, 0.0254 m
 #define GATT_UNIT_LENGTH_FOOT_UUID            0x27A3  // ft, 0.3048 m
 #define GATT_UNIT_LENGTH_MILE_UUID            0x27A4  // mi, 1609.347 m
-#define GATT_UNIT_PRESSURE_PFPSI_UUID         0x27A5  // psi, 6.894757 × 103 Pa
+#define GATT_UNIT_PRESSURE_PFPSI_UUID         0x27A5  // psi, 6.894757 Ã— 103 Pa
 #define GATT_UNIT_VELOCITY_KMPH_UUID          0x27A6  // km/h, 0.2777778 m^s-1
 #define GATT_UNIT_VELOCITY_MPH_UUID           0x27A7  // mi/h, 0.44704 m^ s-1
 #define GATT_UNIT_ANGULAR_VELOCITY_RPM_UUID   0x27A8  // r/min, 0.1047198 rad s-1
 #define GATT_UNIT_ENERGY_GCAL_UUID            0x27A9  //
 #define GATT_UNIT_ENERGY_KCAL_UUID            0x27AA  // kcal, 4190.02 J
 #define GATT_UNIT_ENERGY_KWH_UUID             0x27AB  // kWh, 3600000 J
-#define GATT_UNIT_THERMODYN_TEMP_DF_UUID      0x27AC  // oF, t/oF = T/K × 1.8 - 459.67
+#define GATT_UNIT_THERMODYN_TEMP_DF_UUID      0x27AC  // oF, t/oF = T/K Ã— 1.8 - 459.67
 #define GATT_UNIT_PERCENTAGE_UUID             0x27AD  // %
 #define GATT_UNIT_PER_MILE_UUID               0x27AE  //
 #define GATT_UNIT_PERIOD_BPM_UUID             0x27AF  //

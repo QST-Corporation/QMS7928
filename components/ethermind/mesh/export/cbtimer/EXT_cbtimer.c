@@ -7,7 +7,7 @@
 */
 
 /*
-    Copyright (C) 2015. Phyplus Ltd.
+    Copyright (C) 2015. QST Ltd.
     All rights reserved.
 */
 

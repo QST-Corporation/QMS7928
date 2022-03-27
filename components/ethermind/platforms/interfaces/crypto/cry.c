@@ -250,7 +250,7 @@ INT32 cry_aes_128_cmac
 INT32 cry_ecdh_init(void)
 {
     #ifdef PHYPLUS_ECDH_ENABLE
-    return (phyplus_ecdh_init());
+    return (qst_ecdh_init());
     #else
     UINT8 ret;
     ssp_init();
@@ -269,7 +269,7 @@ INT32 cry_ecdh_init(void)
 INT32 cry_ecdh_get_public_key(UCHAR* pubkey)
 {
     #ifdef PHYPLUS_ECDH_ENABLE
-    return (phyplus_ecdh_get_public_key(pubkey));
+    return (qst_ecdh_get_public_key(pubkey));
     #else
     /* TODO: Check Endianness */
     cry_reverse_bytestream_endianness(cry_ecpubkey.x, pubkey, DHKEY_LEN);
@@ -287,7 +287,7 @@ INT32 cry_ecdh_generate_secret
 )
 {
     #ifdef PHYPLUS_ECDH_ENABLE
-    return (phyplus_ecdh_generate_secret(peer_pubkey,secret,secret_len));
+    return (qst_ecdh_generate_secret(peer_pubkey,secret,secret_len));
     #else
     UINT8 ret;
     INT32 retval;
@@ -434,7 +434,7 @@ uCrypto_RNG_Function uCrypto_get_rng(void)
 }
 
 
-INT32 phyplus_ecdh_init(void)
+INT32 qst_ecdh_init(void)
 {
 //    uint32 T1;
     uint8 my_public_point0[64], my_private_key0[32];
@@ -466,7 +466,7 @@ INT32 phyplus_ecdh_init(void)
     return 0;
 }
 
-INT32 phyplus_ecdh_generate_secret(UCHAR* peer_pubkey, UCHAR* secret, UINT16 secret_len)
+INT32 qst_ecdh_generate_secret(UCHAR* peer_pubkey, UCHAR* secret, UINT16 secret_len)
 {
     uint8 pubkey[64];
     uint8 dhkey[32];
@@ -487,7 +487,7 @@ INT32 phyplus_ecdh_generate_secret(UCHAR* peer_pubkey, UCHAR* secret, UINT16 sec
     }
 }
 
-INT32 phyplus_ecdh_get_public_key(UCHAR* pubkey)
+INT32 qst_ecdh_get_public_key(UCHAR* pubkey)
 {
     /* TODO: Check Endianness */
     cry_reverse_bytestream_endianness(phy_ecpubkey.x, pubkey, DHKEY_LEN);
@@ -499,7 +499,7 @@ INT32 phyplus_ecdh_get_public_key(UCHAR* pubkey)
 
 //#define cry_dump_key(a,b,c)     do{cry_printf(a);for(int i=0;i<b;i++){cry_printf("%02x ",c[i]);}cry_printf("\n");}while(0)
 #if 0
-void test_verify_phyplus_ecdh(void)
+void test_verify_qst_ecdh(void)
 {
     UCHAR pubkey0[64];
     UCHAR pubkey1[64];
@@ -509,17 +509,17 @@ void test_verify_phyplus_ecdh(void)
     int ret;
     ret=cry_ecdh_init();
     //cry_printf(" cry ini %d\n",ret);
-    ret=phyplus_ecdh_init();
+    ret=qst_ecdh_init();
     //cry_printf(" phy ini %d\n",ret);
     ret=cry_ecdh_get_public_key(pubKeyT);
     cry_reverse_bytestream_endianness(pubKeyT,pubkey0,DHKEY_LEN);
     cry_reverse_bytestream_endianness(pubKeyT+DHKEY_LEN,pubkey0+DHKEY_LEN,DHKEY_LEN);
-    ret=phyplus_ecdh_get_public_key(pubKeyT);
+    ret=qst_ecdh_get_public_key(pubKeyT);
     cry_reverse_bytestream_endianness(pubKeyT,pubkey1,DHKEY_LEN);
     cry_reverse_bytestream_endianness(pubKeyT+DHKEY_LEN,pubkey1+DHKEY_LEN,DHKEY_LEN);
     ret=cry_ecdh_generate_secret(pubkey1, sec0, 32, NULL);
     //cry_printf(" cry sec %d\n",ret);
-    ret=phyplus_ecdh_generate_secret(pubkey0, sec1, 32);
+    ret=qst_ecdh_generate_secret(pubkey0, sec1, 32);
     //cry_printf(" phy sec %d\n",ret);
 //    cry_dump_key("[cry_pvt]\n",32,cry_ecpvtkey);
 //    cry_dump_key("[cry_pub_x]\n",32,cry_ecpubkey.x);

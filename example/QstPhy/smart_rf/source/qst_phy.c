@@ -1,16 +1,16 @@
 /**************************************************************************************************
 
-    Phyplus Microelectronics Limited confidential and proprietary.
+    Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Phyplus Microelectronics
-    Limited ("Phyplus"). Your use of this Software is limited to those
+    IMPORTANT: All rights of this software belong to Shanghai QST 
+    Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
-    of agreements as a customer or a partner of Phyplus. You may not use this
+    of agreements as a customer or a partner of QST. You may not use this
     Software unless you agree to abide by the terms of these agreements.
     You acknowledge that the Software may not be modified, copied,
-    distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy
+    distributed or disclosed unless embedded on a QST Bluetooth Low Energy
     (BLE) integrated circuit, either as a product or is integrated into your
     products.  Other than for the aforementioned purposes, you may not use,
     reproduce, copy, prepare derivative works of, modify, distribute, perform,
@@ -20,7 +20,7 @@
     PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
     INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
     NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-    PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
+    QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
     NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
     LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
     INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
@@ -31,11 +31,11 @@
 **************************************************************************************************/
 
 /**************************************************************************************************
-    Filename:       phy_plus_phy.c
+    Filename:       qst_phy.c
     Revised:
     Revision:
 
-    Description:    This file contains the phyplus phy sample application
+    Description:    This file contains the QST phy sample application
 
 
 **************************************************************************************************/
@@ -49,7 +49,7 @@
 #include "OSAL_PwrMgr.h"
 #include "log.h"
 #include "timer.h"
-#include "phy_plus_phy.h"
+#include "qst_phy.h"
 #include "ll.h"
 #include "ll_hw_drv.h"
 #include "clock.h"
@@ -136,7 +136,7 @@ typedef struct phyCtx_s
 /*********************************************************************
     LOCAL VARIABLES
 */
-uint8 PhyPlusPhy_TaskID; // Task ID for internal task/event processing
+uint8 QstPhy_TaskID; // Task ID for internal task/event processing
 //volatile uint32 phyWaitingIrq = FALSE;
 uint32 PHY_ISR_entry_time = 0;
 
@@ -163,7 +163,7 @@ static uint8_t phy_rx_data_check(void)
         return TRUE;
     }
 
-    osal_set_event(PhyPlusPhy_TaskID,PPP_RX_DATA_PROCESS_EVT);
+    osal_set_event(QstPhy_TaskID,PPP_RX_DATA_PROCESS_EVT);
     return 0;
 }
 
@@ -396,7 +396,7 @@ void PLUSPHY_IRQHandler(void)
             (s_phy.Status == PHYPLUS_RFPHY_TX_ONLY)
        )
     {
-        osal_set_event(PhyPlusPhy_TaskID,PPP_TX_DONE_EVT);
+        osal_set_event(QstPhy_TaskID,PPP_TX_DONE_EVT);
     }
     else if(mode == LL_HW_MODE_SRX  &&
             (s_phy.Status == PHYPLUS_RFPHY_RX_ONLY)
@@ -429,7 +429,7 @@ void PLUSPHY_IRQHandler(void)
             }
         }
 
-        osal_set_event(PhyPlusPhy_TaskID,PPP_RX_DONE_EVT);
+        osal_set_event(QstPhy_TaskID,PPP_RX_DONE_EVT);
     }
     else if(mode == LL_HW_MODE_TRX  &&
             (s_phy.Status == PHYPLUS_RFPHY_TRX_ONLY)
@@ -462,7 +462,7 @@ void PLUSPHY_IRQHandler(void)
             }
         }
 
-        osal_set_event(PhyPlusPhy_TaskID,PPP_TRX_DONE_EVT);
+        osal_set_event(QstPhy_TaskID,PPP_TRX_DONE_EVT);
     }
 
     // post ISR process
@@ -471,7 +471,7 @@ void PLUSPHY_IRQHandler(void)
 }
 
 /*********************************************************************
-    @fn      PhyPlusPhy_Init
+    @fn      QstPhy_Init
 
     @brief   Initialization function for the Simple BLE Peripheral App Task.
             This is called during initialization and should contain
@@ -484,9 +484,9 @@ void PLUSPHY_IRQHandler(void)
 
     @return  none
 */
-void PhyPlusPhy_Init(uint8 task_id)
+void QstPhy_Init(uint8 task_id)
 {
-    PhyPlusPhy_TaskID = task_id;
+    QstPhy_TaskID = task_id;
     //set phy irq handeler
     JUMP_FUNCTION(V4_IRQ_HANDLER)                   =   (uint32_t)&PLUSPHY_IRQHandler;
     // read flash driectly becasue HW has do the address mapping for read Flash operation
@@ -554,8 +554,8 @@ void PhyPlusPhy_Init(uint8 task_id)
     s_pktCfg.crcSeed    =   DEFAULT_CRC_SEED;
     s_pktCfg.wtSeed     =   WHITEN_SEED_CH37;//DEFAULT_WHITEN_SEED;
     s_pktCfg.syncWord   =   DEFAULT_SYNCWORD;
-    VOID osal_start_timerEx(PhyPlusPhy_TaskID, PPP_PERIODIC_TX_EVT, 1000);
-    VOID osal_start_timerEx(PhyPlusPhy_TaskID, PPP_PERIODIC_RX_EVT, 2500);
+    VOID osal_start_timerEx(QstPhy_TaskID, PPP_PERIODIC_TX_EVT, 1000);
+    VOID osal_start_timerEx(QstPhy_TaskID, PPP_PERIODIC_RX_EVT, 2500);
     LOG("[PHY] init done %d rfchn%d SW[%8x] CRC[%d %8x] WT[%2x]\n"\
         ,s_phy.Status,s_phy.rfChn,s_pktCfg.syncWord,s_pktCfg.crcFmt, s_pktCfg.crcSeed,s_pktCfg.wtSeed);
 }
@@ -622,7 +622,7 @@ static void process_tx_done_evt(void)
 
 
 /*********************************************************************
-    @fn      PhyPlusPhy_ProcessEvent
+    @fn      QstPhy_ProcessEvent
 
     @brief   Application Task event processor.  This function
             is called to process all events for the task.  Events
@@ -634,7 +634,7 @@ static void process_tx_done_evt(void)
 
     @return  events not processed
 */
-uint16 PhyPlusPhy_ProcessEvent(uint8 task_id, uint16 events)
+uint16 QstPhy_ProcessEvent(uint8 task_id, uint16 events)
 {
     VOID task_id;
 
@@ -646,12 +646,12 @@ uint16 PhyPlusPhy_ProcessEvent(uint8 task_id, uint16 events)
             s_phy.rfChn = BLE_ADV_CHN37;
             s_pktCfg.wtSeed = WHITEN_SEED_CH37;
             phy_rf_tx();
-            osal_start_timerEx(PhyPlusPhy_TaskID,PPP_PERIODIC_TX_EVT,s_phy.txIntv);
+            osal_start_timerEx(QstPhy_TaskID,PPP_PERIODIC_TX_EVT,s_phy.txIntv);
         }
         else
         {
             LOG("SKIP TX_EVT Current Stats %d\n",s_phy.Status);
-            osal_start_timerEx(PhyPlusPhy_TaskID,PPP_PERIODIC_TX_EVT,20);
+            osal_start_timerEx(QstPhy_TaskID,PPP_PERIODIC_TX_EVT,20);
         }
 
         return(events ^ PPP_PERIODIC_TX_EVT);
@@ -666,12 +666,12 @@ uint16 PhyPlusPhy_ProcessEvent(uint8 task_id, uint16 events)
             s_phy.rxScanT0 = read_current_fine_time();
             s_pktCfg.wtSeed = WHITEN_SEED_CH37;
             phy_rf_rx();
-            osal_start_timerEx(PhyPlusPhy_TaskID,PPP_PERIODIC_RX_EVT,s_phy.rxIntv);
+            osal_start_timerEx(QstPhy_TaskID,PPP_PERIODIC_RX_EVT,s_phy.rxIntv);
         }
         else
         {
             LOG("SKIP RX_EVT Current Stats %d\n",s_phy.Status);
-            osal_start_timerEx(PhyPlusPhy_TaskID,PPP_PERIODIC_RX_EVT,20);
+            osal_start_timerEx(QstPhy_TaskID,PPP_PERIODIC_RX_EVT,20);
         }
 
         return(events ^ PPP_PERIODIC_RX_EVT);

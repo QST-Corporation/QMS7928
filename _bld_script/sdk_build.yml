@@ -22,17 +22,17 @@ aox_lib:
 - [Objects\aoxEst.lib, ..\aoxEst.lib]
 
 smart_rf:
-- example\PhyPlusPhy\smart_rf\smart_rf.uvprojx
+- example\QstPhy\smart_rf\smart_rf.uvprojx
 
 phy_tx:
-- example\PhyPlusPhy\aoa_test\PhyPlusPhy.uvprojx
+- example\QstPhy\aoa_test\QstPhy.uvprojx
 - {'PHY_MODE_DEF':'0'}
-- [Objects\PhyPlusPhy.hex, bin\ppp_tx.hex]
+- [Objects\QstPhy.hex, bin\ppp_tx.hex]
 
 phy_rx:
-- example\PhyPlusPhy\aoa_test\PhyPlusPhy.uvprojx
+- example\QstPhy\aoa_test\QstPhy.uvprojx
 - {'PHY_MODE_DEF':'1'}
-- [Objects\PhyPlusPhy.hex, bin\ppp_rx.hex]
+- [Objects\QstPhy.hex, bin\ppp_rx.hex]
 
 dtm:
 - example\ble_peripheral\simpleBlePeripheral\simpleBlePeripheral.uvprojx

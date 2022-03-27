@@ -1,16 +1,16 @@
 /**************************************************************************************************
 
-    Phyplus Microelectronics Limited confidential and proprietary.
+    Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Phyplus Microelectronics
-    Limited ("Phyplus"). Your use of this Software is limited to those
+    IMPORTANT: All rights of this software belong to Shanghai QST 
+    Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
-    of agreements as a customer or a partner of Phyplus. You may not use this
+    of agreements as a customer or a partner of QST. You may not use this
     Software unless you agree to abide by the terms of these agreements.
     You acknowledge that the Software may not be modified, copied,
-    distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy
+    distributed or disclosed unless embedded on a QST Bluetooth Low Energy
     (BLE) integrated circuit, either as a product or is integrated into your
     products.  Other than for the aforementioned purposes, you may not use,
     reproduce, copy, prepare derivative works of, modify, distribute, perform,
@@ -20,7 +20,7 @@
     PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
     INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
     NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-    PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
+    QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
     NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
     LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
     INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
@@ -31,11 +31,11 @@
 **************************************************************************************************/
 
 /**************************************************************************************************
-    Filename:       phy_plus_phy.h
+    Filename:       qst_phy.h
     Revised:
     Revision:
 
-    Description:    This file contains the phyplus phy sample application
+    Description:    This file contains the QST phy sample application
                   definitions and prototypes.
 
 
@@ -76,14 +76,14 @@ extern "C"
 */
 
 /*
-    Task Initialization for the PHYPLUS PHY Application
+    Task Initialization for the QST PHY Application
 */
-extern void PhyPlusPhy_Init( uint8 task_id );
+extern void QstPhy_Init( uint8 task_id );
 
 /*
-    Task Event Processor for the PHYPLUS PHY Application
+    Task Event Processor for the QST PHY Application
 */
-extern uint16 PhyPlusPhy_ProcessEvent( uint8 task_id, uint16 events );
+extern uint16 QstPhy_ProcessEvent( uint8 task_id, uint16 events );
 
 /*********************************************************************
 *********************************************************************/

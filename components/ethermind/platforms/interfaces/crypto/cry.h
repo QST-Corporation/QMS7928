@@ -262,9 +262,9 @@ typedef int(*uCrypto_RNG_Function)(uint8_t* dest, uint32_t size);
 void uCrypto_set_rng(uCrypto_RNG_Function rng_function);
 
 uCrypto_RNG_Function uCrypto_get_rng(void);
-INT32 phyplus_ecdh_init(void);
-INT32 phyplus_ecdh_generate_secret(UCHAR* peer_pubkey, UCHAR* secret, UINT16 secret_len);
-INT32 phyplus_ecdh_get_public_key(UCHAR* pubkey);
+INT32 qst_ecdh_init(void);
+INT32 qst_ecdh_generate_secret(UCHAR* peer_pubkey, UCHAR* secret, UINT16 secret_len);
+INT32 qst_ecdh_get_public_key(UCHAR* pubkey);
 
 
-void test_verify_phyplus_ecdh(void);
+void test_verify_qst_ecdh(void);

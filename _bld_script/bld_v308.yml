@@ -28,7 +28,7 @@ sbc:
 - [Objects\simpleBleCentral.hex, bin\sbc.hex]
 
 smart_rf:
-- example\PhyPlusPhy\smart_rf\smart_rf.uvprojx
+- example\QstPhy\smart_rf\smart_rf.uvprojx
 
 wrist:
 - example\ble_peripheral\wrist\wrist.uvprojx

@@ -1,16 +1,16 @@
 /**************************************************************************************************
 
-    Phyplus Microelectronics Limited confidential and proprietary.
+    Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Phyplus Microelectronics
-    Limited ("Phyplus"). Your use of this Software is limited to those
+    IMPORTANT: All rights of this software belong to Shanghai QST 
+    Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
-    of agreements as a customer or a partner of Phyplus. You may not use this
+    of agreements as a customer or a partner of QST. You may not use this
     Software unless you agree to abide by the terms of these agreements.
     You acknowledge that the Software may not be modified, copied,
-    distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy
+    distributed or disclosed unless embedded on a QST Bluetooth Low Energy
     (BLE) integrated circuit, either as a product or is integrated into your
     products.  Other than for the aforementioned purposes, you may not use,
     reproduce, copy, prepare derivative works of, modify, distribute, perform,
@@ -20,7 +20,7 @@
     PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
     INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
     NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-    PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
+    QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
     NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
     LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
     INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
@@ -814,7 +814,7 @@ extern bStatus_t GATT_DiscCharsByUUID( uint16 connHandle, attReadByTypeReq_t* pR
 
 /**
     @brief   This sub-procedure is used by a client to find all the
-            characteristic descriptor’s Attribute Handles and Attribute
+            characteristic descriptor's Attribute Handles and Attribute
             Types within a characteristic definition when only the
             characteristic handle range is known. The characteristic
             specified is identified by the characteristic handle range.
@@ -1178,7 +1178,7 @@ extern bStatus_t GATT_ReliableWrites( uint16 connHandle, attPrepareWriteReq_t* p
 /**
     @brief   This sub-procedure is used to read a characteristic descriptor
             from a server when the client knows the characteristic descriptor
-            declaration’s Attribute handle.
+            declaration's Attribute handle.
 
             The ATT Read Request is used for this sub-procedure. The Read
             Request is used with the Attribute Handle parameter set to the
@@ -1211,7 +1211,7 @@ extern bStatus_t GATT_ReadCharDesc( uint16 connHandle, attReadReq_t* pReq, uint8
 /**
     @brief   This sub-procedure is used to read a characteristic descriptor
             from a server when the client knows the characteristic descriptor
-            declaration’s Attribute handle and the length of the characteristic
+            declaration's Attribute handle and the length of the characteristic
             descriptor declaration is longer than can be sent in a single Read
             Response attribute protocol message.
 

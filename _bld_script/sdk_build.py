@@ -29,8 +29,8 @@ dict_build_list = {}
 dict_build_list={'rfslave' : ['lib\\generate_lib\\rf.uvprojx',['Objects\\rf.lib', '..\\rf.lib']],
 'ble_host' : ['lib\\generate_ble_host_lib\\ble_host.uvprojx',['Objects\\ble_host.lib', '..\\ble_host.lib']],
 'aox_lib' : ['lib\\generate_aoxEst_lib\\aoxEst.uvprojx',['Objects\\aoxEst.lib', '..\\aoxEst.lib']],
-'phy_tx'  : ['example\\PhyPlusPhy\\aoa_test\\PhyPlusPhy.uvprojx',{'PHY_MODE_DEF':'0'},['Objects\\PhyPlusPhy.hex','bin\\ppp_tx.hex']],
-'phy_rx'  : ['example\\PhyPlusPhy\\aoa_test\\PhyPlusPhy.uvprojx',{'PHY_MODE_DEF':'1'},['Objects\\PhyPlusPhy.hex','bin\\ppp_rx.hex']],
+'phy_tx'  : ['example\\QstPhy\\aoa_test\\QstPhy.uvprojx',{'PHY_MODE_DEF':'0'},['Objects\\QstPhy.hex','bin\\ppp_tx.hex']],
+'phy_rx'  : ['example\\QstPhy\\aoa_test\\QstPhy.uvprojx',{'PHY_MODE_DEF':'1'},['Objects\\QstPhy.hex','bin\\ppp_rx.hex']],
 'sbp' : ['example\\ble_peripheral\\simpleBlePeripheral\\simpleBlePeripheral.uvprojx'],
 'sbc' : ['example\\ble_central\\simpleBleCentral\\simpleBleCentral.uvprojx'],
 'app0' : ['example\\peripheral\\app0_tasktst\\app0_m0\\app0_m0.uvprojx'],
@@ -278,17 +278,17 @@ def make_version_file(path, major, minor, revision, test_build = ''):
 	list_sdk_version_h = [
 	'/**************************************************************************************************',
 	' ',
-	'  Phyplus Microelectronics Limited confidential and proprietary. ',
+	'  Shanghai QST Corporation confidential and proprietary. ',
 	'  All rights reserved.',
 	' ',
-	'  IMPORTANT: All rights of this software belong to Phyplus Microelectronics ',
-	'  Limited ("Phyplus"). Your use of this Software is limited to those ',
+	'  IMPORTANT: All rights of this software belong to Shanghai QST ',
+	'  Corporation ("QST"). Your use of this Software is limited to those ',
 	'  specific rights granted under  the terms of the business contract, the ',
 	'  confidential agreement, the non-disclosure agreement and any other forms ',
-	'  of agreements as a customer or a partner of Phyplus. You may not use this ',
+	'  of agreements as a customer or a partner of QST. You may not use this ',
 	'  Software unless you agree to abide by the terms of these agreements. ',
 	'  You acknowledge that the Software may not be modified, copied, ',
-	'  distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy ',
+	'  distributed or disclosed unless embedded on a QST Bluetooth Low Energy ',
 	'  (BLE) integrated circuit, either as a product or is integrated into your ',
 	'  products.  Other than for the aforementioned purposes, you may not use, ',
 	'  reproduce, copy, prepare derivative works of, modify, distribute, perform, ',
@@ -298,7 +298,7 @@ def make_version_file(path, major, minor, revision, test_build = ''):
 	'  PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,',
 	'  INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,',
 	'  NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL',
-	'  PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,',
+	'  QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,',
 	'  NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER',
 	'  LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES',
 	'  INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE',
@@ -413,7 +413,7 @@ def get_param(param):
 	return dict_param
 
 def help(prj = None):
-	print('sdk_build.py: Build PhyPlus BLE SDK')
+	print('sdk_build.py: Build QST BLE SDK')
 	print('useage:')
 	print('	sdk_build.py [-help [projectname]] [-clear] [-ver 1.1.1.b] [-path sdk_path][-list] [-b [projectname]|[all]]')
 	

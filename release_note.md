@@ -63,7 +63,7 @@
                       2.bugfix get subscription list error
                       3.bugfix stop timer failed when event id can't find
                       4.add debug information for queue full
-                      5.rename phyplus model to vendor model
+                      5.rename QST model to vendor model
 
 ### **[example]**
 

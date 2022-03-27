@@ -6,7 +6,7 @@
     In this file the platform dependent library calls are abstracted
     and mapped to calls used within the EtherMind Stack.
 
-    Version: PhyPlus OSAL
+    Version: QST OSAL
 */
 
 /*

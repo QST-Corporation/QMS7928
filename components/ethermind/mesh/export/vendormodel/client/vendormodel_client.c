@@ -6,7 +6,7 @@
 */
 
 /*
-    Copyright (C) 2020. phyplus Ltd.
+    Copyright (C) 2020. QST Ltd.
     All rights reserved.
 */
 

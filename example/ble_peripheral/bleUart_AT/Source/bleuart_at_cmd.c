@@ -1,16 +1,16 @@
 /**************************************************************************************************
 
-    Phyplus Microelectronics Limited confidential and proprietary.
+    Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Phyplus Microelectronics
-    Limited ("Phyplus"). Your use of this Software is limited to those
+    IMPORTANT: All rights of this software belong to Shanghai QST 
+    Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
-    of agreements as a customer or a partner of Phyplus. You may not use this
+    of agreements as a customer or a partner of QST. You may not use this
     Software unless you agree to abide by the terms of these agreements.
     You acknowledge that the Software may not be modified, copied,
-    distributed or disclosed unless embedded on a Phyplus Bluetooth Low Energy
+    distributed or disclosed unless embedded on a QST Bluetooth Low Energy
     (BLE) integrated circuit, either as a product or is integrated into your
     products.  Other than for the aforementioned purposes, you may not use,
     reproduce, copy, prepare derivative works of, modify, distribute, perform,
@@ -20,7 +20,7 @@
     PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
     INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
     NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
-    PHYPLUS OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
+    QST OR ITS SUBSIDIARIES BE LIABLE OR OBLIGATED UNDER CONTRACT,
     NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
     LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
     INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
@@ -408,20 +408,20 @@ uint16_t at_rx(uint32_t argc, uint8_t* argv[])
 
         AT_LOG("\nPIN :%s",mAT_Ctx.mod_pin);
         #else
-        AT_LOG("\nName     £º%s",mAT_Ctx.mod_name);
+        AT_LOG("\nName     ï¼š%s",mAT_Ctx.mod_name);
 
         if(mAT_Ctx.ble_role)
-            AT_LOG("\nRole     £ºMaster");
+            AT_LOG("\nRole     ï¼šMaster");
         else
-            AT_LOG("\nRole     £ºSlave");
+            AT_LOG("\nRole     ï¼šSlave");
 
         AT_LOG("\nBaudrate : %d",mAT_Ctx.baudrate);
-        AT_LOG("\nBLE addr £º%02x",mAT_Ctx.mac_addr[0]);
+        AT_LOG("\nBLE addr ï¼š%02x",mAT_Ctx.mac_addr[0]);
 
         for(i = 1; i < 6; i++ )
             AT_LOG(":%02x",mAT_Ctx.mac_addr[i]);
 
-        AT_LOG("\nPIN      £º%s",mAT_Ctx.mod_pin);
+        AT_LOG("\nPIN      ï¼š%s",mAT_Ctx.mod_pin);
         #endif
         AT_LOG("\nOK\n");
     }
