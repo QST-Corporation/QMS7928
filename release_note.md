@@ -2,17 +2,17 @@
 
 ## ChipSet
 
-***PHY6222/PHY6252***
+***QMS7928***
 
 ---
 
 ## SDK Version
 
-***PHY62XX_SDK_3.X.X***
+***QMS7928_SDK_1.X.X***
 
 ---
 
-### **Version**: PHY62XX_SDK_3.1.1
+### **Version**: QMS7928_SDK_1.0.0
 
 ### **Change List**
 
@@ -45,7 +45,7 @@
 
 ---
 
-### **Version**: PHY62XX_SDK_3.1.0
+### **Version**: QMS7928_SDK_0.1.0
 
 ### **Change List**
 
@@ -86,7 +86,7 @@
                       2.add llConnTerminate0 symbol
 
 ---
-### **Version**: PHY62XX_SDK_3.0.9
+### **Version**: QMS7928_SDK_0.0.9
 
 ### **Change List**
 
@@ -144,7 +144,7 @@
 
 ---
 
-### **Version**: PHY62XX_SDK_3.0.8
+### **Version**: QMS7928_SDK_0.0.8
 
 ### **Change List**
 
@@ -199,7 +199,7 @@
 
 ---
 
-### **Version**: PHY62XX_SDK_3.0.7
+### **Version**: QMS7928_SDK_0.0.7
 
 ### **Change List**
 

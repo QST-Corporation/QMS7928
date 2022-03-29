@@ -4,7 +4,7 @@ ReleaseTagName:
 - tag_v310
 
 ReleaseBranchName:
-- PHY62XX_SDK_3.1.0
+- QMS7928_SDK_0.1.0
 
 #build config
 # - yaml file

@@ -5,7 +5,7 @@
     @brief multi GAPRole profile code
 
     Group: CMCU, SCS
-    Target Device: PHY6212
+    Target Device: 6212
 
  ******************************************************************************/
 
