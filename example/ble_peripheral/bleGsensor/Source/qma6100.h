@@ -213,6 +213,25 @@ typedef struct
     qma6100_reg_write_byte_t write_byte;
 }qma6100_if_handle_t;
 
+typedef enum
+{
+  rawdata_event     = 0x01,
+  step_event        = 0x02,
+  handup_event      = 0x03,
+  anymotion_event   = 0x04,
+  tap_event         = 0x05,
+  fifo_event        = 0x06
+}ev_id_t;
+
+typedef struct qma6100_ev{
+  ev_id_t ev;
+  uint8_t flg;
+  uint8_t size;
+  void*   data;
+}qma6100_ev_t;
+
+typedef void (*qma6100_evt_hdl_t)	(qma6100_ev_t* pev);
+
 typedef struct
 {
     bool initialized;
@@ -221,6 +240,7 @@ typedef struct
     //qma6100_config_t cfg;
     qma6100_raw_t raw;
     const qma6100_if_handle_t *hw_if;
+    qma6100_evt_hdl_t evt_hdl;
 }qma6100_device_t;
 
 /******************************************************
@@ -231,7 +251,7 @@ typedef struct
  *             Function Declarations
  ******************************************************/
 qma6100_device_t* get_qma6100_handle(void);
-void qma6100_demo(void);
+void qma6100_demo(qma6100_evt_hdl_t evt_hdl);
 
 #ifdef __cplusplus
 } /* extern "C" */

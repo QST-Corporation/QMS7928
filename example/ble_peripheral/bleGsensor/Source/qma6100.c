@@ -1002,7 +1002,7 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   static uint16_t int1cnt = 0;
   static uint16_t logcnt = 0;
   qma6100_device_t* p_dev = get_qma6100_handle();
-  //qma6100_ev_t qma6100_evt;
+  qma6100_ev_t qma6100_evt;
 
   if (!p_dev->initialized) {
       qma6100_printf("\nInt1: QMA6100P has not been initialized.\n");
@@ -1023,11 +1023,11 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   rdata[0][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4])>>2;
   if (++logcnt > 99) {
     logcnt = 0;
-    qma6100_printf("Raw:  %4d, %4d, %4d\n",rdata[0][0],rdata[0][1],rdata[0][2]);
-    //qma6100_evt.ev = rawdata_event;
-    //qma6100_evt.size = 3*sizeof(int16_t);
-    //qma6100_evt.data = &rdata[0][0];
-    //p_dev->evt_hdl(&qma6100_evt);
+    //qma6100_printf("Raw:  %4d, %4d, %4d\n",rdata[0][0],rdata[0][1],rdata[0][2]);
+    qma6100_evt.ev = rawdata_event;
+    qma6100_evt.size = 3*sizeof(int16_t);
+    qma6100_evt.data = &rdata[0][0];
+    p_dev->evt_hdl(&qma6100_evt);
   }
 
 #if (QMA6100_USE_IIC)
@@ -1093,7 +1093,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
 
     // platform don't support 384 bytes one time , so read it twice . Per your platform , you can read it in one cycle.
     if(readbytes>255)
-    {		
+    {
       cnt1 = readbytes-240;
       readbytes = 240;
     }
@@ -1142,7 +1142,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
 #endif
 }
 
-void qma6100_demo(void)//qma6100_evt_hdl_t evt_hdl)
+void qma6100_demo(qma6100_evt_hdl_t evt_hdl)
 {
   qma6100_device_t* p_dev = get_qma6100_handle();
   //int16_t Acc[3] = {0x00,};
@@ -1151,7 +1151,7 @@ void qma6100_demo(void)//qma6100_evt_hdl_t evt_hdl)
   {
     qma6100_printf("\n\nQMA6100P demo\n");
     if (qma6100_init(p_dev) == QMA_SUCCESS) {
-      //p_dev->evt_hdl = evt_hdl;
+      p_dev->evt_hdl = evt_hdl;
       qma6100_printf("QMA6100P is initialized!\n\n");
     }
   }

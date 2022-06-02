@@ -330,17 +330,17 @@ static int cmd_get_time(const uint8* data, uint16 len)
 //  return cmd_response_err(data, len, APP_SUCCESS);
 //}
 
-//static int cmd_acc_notif_start(const uint8* data, uint16 len)
-//{
-//  sNotifyAccelerationDataFlag = TRUE;
-//  return cmd_response_err(data, len, APP_SUCCESS);
-//}
+static int cmd_acc_notif_start(const uint8* data, uint16 len)
+{
+ sNotifyAccelerationDataFlag = TRUE;
+ return cmd_response_err(data, len, APP_SUCCESS);
+}
 
-//static int cmd_acc_notif_stop(const uint8* data, uint16 len)
-//{
-//  sNotifyAccelerationDataFlag = FALSE;
-//  return cmd_response_err(data, len, APP_SUCCESS);
-//}
+static int cmd_acc_notif_stop(const uint8* data, uint16 len)
+{
+ sNotifyAccelerationDataFlag = FALSE;
+ return cmd_response_err(data, len, APP_SUCCESS);
+}
 
 static int cmd_light_ctrl(const uint8_t* data, uint16_t len)
 {
@@ -485,6 +485,7 @@ int on_recieved_cmd_packet(const uint8* data, uint16 len)
     if(chksum != checksum(data, len-1))
     {
         err_data = WRIST_CMD_UNKNOW;
+        LOG("checksum error\n");
         return cmd_response_err(&err_data, sizeof(err_data), APP_ERR_CRC);
     }
 
@@ -519,13 +520,15 @@ int on_recieved_cmd_packet(const uint8* data, uint16 len)
 //    ret = cmd_HR_stop(data, len);
 //    break;
 
-//  case  WRIST_CMD_ACC_NOTIF_START:
-//    ret = cmd_acc_notif_start(data, len);
-//    break;
-//  case  WRIST_CMD_ACC_NOTIF_STOP:
-//    ret = cmd_acc_notif_stop(data, len);
-//    break;
-//
+    case  WRIST_CMD_ACC_NOTIF_START:
+      LOG("cmd:notify start.\n");
+      ret = cmd_acc_notif_start(data, len);
+      break;
+    case  WRIST_CMD_ACC_NOTIF_STOP:
+      LOG("cmd:notify stop.\n");
+      ret = cmd_acc_notif_stop(data, len);
+      break;
+
     case  WRIST_CMD_LIGHT_CTRL:
         ret = cmd_light_ctrl(data, len);
         break;
@@ -615,6 +618,8 @@ int wristProfileResponseAccelerationData(int gx, int gy, int gz)
 {
     if(sNotifyAccelerationDataFlag)
     {
+        LOG("AccNotifyFlag:%d\n",sNotifyAccelerationDataFlag);
+        LOG("Acc:%d, %d, %d\n", gx, gy, gz);
         int acc[3];
         wristRspAcc_t accdata;
         acc[0] = gx;
@@ -624,6 +629,8 @@ int wristProfileResponseAccelerationData(int gx, int gy, int gz)
         accdata.csn = 0;
         memcpy(accdata.acc, (void*)acc, 4*3);
         accdata.chksum = checksum((uint8*)(&accdata), sizeof(accdata)-1);
+        LOG("notify[%d]:", sizeof(accdata));
+        print_hex((uint8*)(&accdata), sizeof(accdata));
         return cmd_response((uint8*)(&accdata), sizeof(accdata));
     }
 
@@ -834,7 +841,6 @@ static int wristProfile_Notify(attHandleValueNoti_t* pNoti )
     uint16 value;
     GAPRole_GetParameter(GAPROLE_CONNHANDLE, &connHandle);
     value = GATTServApp_ReadCharCfg( connHandle, wristProfileCmdCCC);
-    LOG("GATT_Notification: %x\n", value);
 
     // If notifications enabled
     if ( value & GATT_CLIENT_CFG_NOTIFY )
@@ -842,6 +848,7 @@ static int wristProfile_Notify(attHandleValueNoti_t* pNoti )
         bStatus_t st;
         // Set the handle
         pNoti->handle = wristProfileAttrTbl[2].handle;
+        LOG("GATT_Notification enable: %x\n", value);
         // Send the notification
         st = GATT_Notification( connHandle, pNoti, FALSE);
         LOG("st: %x\n", st);

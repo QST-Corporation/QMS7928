@@ -253,6 +253,19 @@ static void light_timeout_handler(void)
 #endif
 }
 
+void acc_event_handler(qma6100_ev_t *pev)
+{
+    if (pev->ev == rawdata_event) {
+        int gx, gy, gz;
+        int16_t *acc_data = (int16_t *)pev->data;
+        gx = acc_data[0];
+        gy = acc_data[1];
+        gz = acc_data[2];
+        //LOG("acc report: %d, %d, %d\n", gx, gy, gz);
+        wristProfileResponseAccelerationData(gx,gy,gz);
+    }
+}
+
 void appWristInit( uint8 task_id )
 {
     AppWrist_TaskID = task_id;
@@ -377,7 +390,7 @@ uint16 appWristProcEvt( uint8 task_id, uint16 events )
 
     if( events & ACC_DATA_EVT)
     {
-        qma6100_demo();
+        qma6100_demo(acc_event_handler);
         return ( events ^ ACC_DATA_EVT);
     }
 
@@ -417,7 +430,7 @@ static void appWristProcOSALMsg( osal_event_hdr_t* pMsg )
 */
 static void WristGapStateCB( gaprole_States_t newState )
 {
-    LOG("WristGapStateCB: %d", newState);
+    LOG("WristGapStateCB: %d\n", newState);
 
     // if connected
     if (newState == GAPROLE_CONNECTED)
