@@ -750,6 +750,7 @@ void set_map_stepInt(uint8_t enable,int_port_t port)
   qma6100_write_byte(0x13, 0x7F);
   qma6100_write_byte(0x14, 0x0B);
   qma6100_write_byte(0x15, 0x0C);
+  qma6100_write_byte(0x1F, 0x09); //this is for counting animal steps from every step.
 
   if(port==PORT_1)
   {
@@ -782,12 +783,15 @@ void clear_step_cnt(void)
 
 void read_step_cnt(void)
 {
-  uint32_t stepcnt;
+  static uint32_t stepcnt = 0;
+  ret_code_t ret;
   uint8_t reg7,reg8,regd;
   qma6100_read_multi_byte(0x7,&reg7,1);
   qma6100_read_multi_byte(0x8,&reg8,1);
-  qma6100_read_multi_byte(0xd,&regd,1);
-  stepcnt = reg7|(reg8<<8)|(regd<<16);
+  ret = qma6100_read_multi_byte(0xd,&regd,1);
+  if (ret == QMA_SUCCESS) {
+    stepcnt = reg7|(reg8<<8)|(regd<<16);
+  }
   qma6100_printf("Current Stepcnt = %d \n",stepcnt);
 
   if(stepcnt>30000)
@@ -893,19 +897,19 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 
   //set_nomotion(0x1e,5,PORT_2);
   //set_map_raiseINT(1,1,PORT_2);
-  //set_map_stepInt(1,PORT_2);
+  set_map_stepInt(1,PORT_2);
 
   //set_map_fifo(10,FIFO_MODE_STREAM,FIFO_INT_FULL,PORT_2,(AXIS_X|AXIS_Y|AXIS_Z));
 
-  set_dataReadyInt(1,PORT_1);
+  //set_dataReadyInt(1,PORT_1);
 
   //set_map_tapInt(QMA6100_TAP_SINGLE|QMA6100_TAP_DOUBLE,3,5,PORT_2);
 
 
 #ifdef QMA6100_USE_IIC
-  reg = 0x01; //1  INT latched bit0,spi 0x21 ,iic 0x01
+  reg = 0x03; //bit1,0  STEP INT latched,spi 0x23 ,iic 0x03
 #else
-  reg = 0x21;
+  reg = 0x23;
 #endif
 
   qma6100_write_byte(0x21, reg);
@@ -1055,7 +1059,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  //qma6100_i2c_init(p_dev->hw_if);
+  qma6100_i2c_init(p_dev->hw_if);
 #endif
 
   int2cnt++;
@@ -1138,7 +1142,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  //qma6100_i2c_deinit(p_dev->hw_if);
+  qma6100_i2c_deinit(p_dev->hw_if);
 #endif
 }
 
@@ -1169,8 +1173,8 @@ const qma6100_if_handle_t qma6100_if_cfg = {
   .pin = {
       .scl = P23, //P24,P25 cannot be pull-up
       .sda = P26,
-      .int1 = P2,
-      .int2 = GPIO_DUMMY,
+      .int1 = GPIO_DUMMY,
+      .int2 = P2,
   },
   .read_byte = qma6100_read_byte,
   .read_multi_byte = qma6100_read_multi_byte,
