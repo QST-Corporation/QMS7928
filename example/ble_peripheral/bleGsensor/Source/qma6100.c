@@ -132,10 +132,14 @@ static void qma6100_if_init(const qma6100_if_handle_t *p_if)
 
   if (p_if->pin.int1 != GPIO_DUMMY) {
     //hal_gpio_init();
+    hal_gpio_pin_init(p_if->pin.int1,IE);
+    hal_gpio_pull_set(p_if->pin.int1,PULL_DOWN);
     hal_gpioin_register(p_if->pin.int1, qma6100_int1_handler, NULL);
   }
   if (p_if->pin.int2 != GPIO_DUMMY) {
     //hal_gpio_init();
+    hal_gpio_pin_init(p_if->pin.int2,IE);
+    hal_gpio_pull_set(p_if->pin.int2,PULL_DOWN);
     hal_gpioin_register(p_if->pin.int2, qma6100_int2_handler, NULL);
   }
 }
