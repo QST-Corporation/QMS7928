@@ -927,7 +927,7 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   get_dieID_WaferID();
   qma6100_printf("4\n");
 
-  //ComparetoDefaultRegvalue();
+  ComparetoDefaultRegvalue();
   qma6100_printf("5\n");
   set_chip_mode(WAKEMODE);
 
@@ -974,25 +974,27 @@ ret_code_t qma6100_init(qma6100_device_t* p_dev)
   return ret;
 }
 
-void qma6100_data_read(qma6100_device_t* p_dev, int16_t *pdata, uint8_t size)
+ret_code_t qma6100_data_read(int16_t *pdata, uint8_t size)
 {
+  qma6100_device_t* p_dev = get_qma6100_handle();
   uint8_t raw[6] = {0x00,};
+  ret_code_t ret = QMA_ERROR;
 
   if (size<sizeof(raw)) {
       qma6100_printf("buffer overflow, size:%d, expected:%d\n", size, sizeof(raw));
-      return;
+      return ret;
   }
 
   if (!p_dev->initialized) {
       qma6100_printf("\nInt1: QMA6100P has not been initialized.\n");
-      return;
+      return ret;
   }
 
 #if (QMA6100_USE_IIC)
   qma6100_i2c_init(p_dev->hw_if);
 #endif
 
-  qma6100_read_multi_byte(0x01, raw, sizeof(raw));
+  ret = qma6100_read_multi_byte(0x01, raw, sizeof(raw));
   *pdata = (int16_t)(raw[1]<<8) + raw[0];
   *(pdata+1) = (int16_t)(raw[3]<<8) + raw[2];
   *(pdata+2) = (int16_t)(raw[5]<<8) + raw[4];
@@ -1000,6 +1002,8 @@ void qma6100_data_read(qma6100_device_t* p_dev, int16_t *pdata, uint8_t size)
 #if (QMA6100_USE_IIC)
   qma6100_i2c_deinit(p_dev->hw_if);
 #endif
+
+  return ret;
 }
 
 static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
@@ -1018,12 +1022,13 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  //qma6100_i2c_init(p_dev->hw_if);
+  qma6100_i2c_init(p_dev->hw_if);
 #endif
 
   int1cnt++;
   qma6100_read_multi_byte(0x09, int_status,3);
   //qma6100_printf("Int1 cnt=%d,state[0x%x,0x%x,0x%x]\n",int1cnt,int_status[0],int_status[1],int_status[2]);
+  qma6100_printf("Int1 cnt=%d\n",int1cnt);
 
   qma6100_read_multi_byte(0x01,rawdata,6);
   rdata[0][0] = (int16_t)(((unsigned short)rawdata[1]<<8) + (unsigned short)rawdata[0])>>2;
@@ -1031,7 +1036,7 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   rdata[0][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4])>>2;
   if (++logcnt > 99) {
     logcnt = 0;
-    //qma6100_printf("Raw:  %4d, %4d, %4d\n",rdata[0][0],rdata[0][1],rdata[0][2]);
+    qma6100_printf("Raw:  %4d, %4d, %4d\n",rdata[0][0],rdata[0][1],rdata[0][2]);
     qma6100_evt.ev = rawdata_event;
     qma6100_evt.size = 3*sizeof(int16_t);
     qma6100_evt.data = &rdata[0][0];
@@ -1150,7 +1155,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
 #endif
 }
 
-void qma6100_demo(qma6100_evt_hdl_t evt_hdl)
+ret_code_t qma6100_demo(qma6100_evt_hdl_t evt_hdl)
 {
   qma6100_device_t* p_dev = get_qma6100_handle();
   //int16_t Acc[3] = {0x00,};
@@ -1161,13 +1166,16 @@ void qma6100_demo(qma6100_evt_hdl_t evt_hdl)
     if (qma6100_init(p_dev) == QMA_SUCCESS) {
       p_dev->evt_hdl = evt_hdl;
       qma6100_printf("QMA6100P is initialized!\n\n");
+      return QMA_SUCCESS;
     }
   }
   else
   {
-     //qma6100_data_read(p_dev, Acc, sizeof(Acc));
+     //qma6100_data_read(Acc, sizeof(Acc));
      //qma6100_printf("X %d, Y %d, Z %d\n", Acc[0], Acc[1], Acc[2]);
+     return QMA_SUCCESS;
   }
+  return QMA_ERROR;
 }
 
 const qma6100_if_handle_t qma6100_if_cfg = {

@@ -323,16 +323,16 @@ void appWristInit( uint8 task_id )
     DevInfo_AddService( );
     ota_app_AddService();
     wristProfile_AddService(wristCB);
-    app_datetime_init();
+    //app_datetime_init();
 
     // initial QST g-sensor
     //qma6100_demo();
 
     // Setup a delayed profile startup
     osal_set_event( AppWrist_TaskID, START_DEVICE_EVT );
-    light_init(led_pins,3);
-    osal_start_reload_timer(AppWrist_TaskID, TIMER_LIGHT_EVT, 1000);
-    osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 500);
+    //light_init(led_pins,3);
+    //osal_start_reload_timer(AppWrist_TaskID, TIMER_LIGHT_EVT, 1000);
+    osal_start_timerEx(AppWrist_TaskID, ACC_INIT_EVT, 500);
 }
 
 /*********************************************************************
@@ -388,9 +388,25 @@ uint16 appWristProcEvt( uint8 task_id, uint16 events )
         return ( events ^ TIMER_LIGHT_EVT);
     }
 
+    if( events & ACC_INIT_EVT)
+    {
+        static uint16_t initCnt = 0;
+        if (qma6100_demo(acc_event_handler) != QMA_SUCCESS) {
+          osal_start_timerEx(AppWrist_TaskID, ACC_INIT_EVT, 1000);
+          LOG("ReInit Acc %d\n", ++initCnt);
+        }
+        else {
+          //osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 500);
+        } 
+        return ( events ^ ACC_INIT_EVT);
+    }
+
     if( events & ACC_DATA_EVT)
     {
-        qma6100_demo(acc_event_handler);
+        int16_t Acc[3] = {0x00,};
+        if (qma6100_data_read(Acc, sizeof(Acc)) == QMA_SUCCESS) {
+          LOG("X %d, Y %d, Z %d\n", Acc[0], Acc[1], Acc[2]);
+        }
         return ( events ^ ACC_DATA_EVT);
     }
 

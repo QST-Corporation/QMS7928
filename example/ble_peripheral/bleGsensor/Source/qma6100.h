@@ -251,7 +251,8 @@ typedef struct
  *             Function Declarations
  ******************************************************/
 qma6100_device_t* get_qma6100_handle(void);
-void qma6100_demo(qma6100_evt_hdl_t evt_hdl);
+ret_code_t qma6100_demo(qma6100_evt_hdl_t evt_hdl);
+ret_code_t qma6100_data_read(int16_t *pdata, uint8_t size);
 
 #ifdef __cplusplus
 } /* extern "C" */
