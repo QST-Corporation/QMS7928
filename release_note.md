@@ -12,6 +12,26 @@
 
 ---
 
+### **Version**: QMS7928_SDK_1.0.1
+
+### **Change List**
+
+### **[components]**
+    driver:
+        adc         : update adc driver
+
+### **[example]**
+    bleGsensor      : add ble g-sensor example, support Acc raw data notification and step counting function
+    qst_evk         : add QST EVK demo
+    adc.............: update adc demo according to updated adc driver
+
+### **[lib]**
+
+
+### **[misc]**
+
+---
+
 ### **Version**: QMS7928_SDK_1.0.0
 
 ### **Change List**
