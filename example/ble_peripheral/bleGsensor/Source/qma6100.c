@@ -276,6 +276,7 @@ it will compare all the resigers value with their default value.
 void ComparetoDefaultRegvalue(void)
 {
   uint8_t i,reg;
+  uint8_t cnt = 1;
   /*just for reference , some of it may be changed in anytime*/
   uint8_t reg_default_value[0x60]=
   {
@@ -301,11 +302,11 @@ void ComparetoDefaultRegvalue(void)
       if(i==0x58)
         i=0x5F;
       qma6100_read_multi_byte(i,&reg,1);
-      WaitMs(2);
+      WaitMs(1);
       if(reg!=reg_default_value[i]||i==0x33)
-      qma6100_printf("6100P Reg 0x%x= 0x%x\n",i,reg);
+      qma6100_printf("Reg[0x%02x]=0x%02x%s",i,reg,(cnt++)%2?", ":"\n");
     }
-  qma6100_printf("6100P Regvalue CMP end\n");
+  qma6100_printf("\n6100P Regvalue CMP end\n");
 }
 
 /*
@@ -835,10 +836,9 @@ void set_map_raiseINT(uint8_t upenable,uint8_t downenable,int_port_t port)
   }
 }
 
-
 void justFOR6100(void)
 {
-  qma6100_write_byte(0x50, 0x51); // 1 just for 6100
+  //qma6100_write_byte(0x50, 0x51); // 1 just for 6100
   qma6100_write_byte(0x4A, 0x20); // enable  DWA of AFE
   qma6100_write_byte(0x56, 0x01); // AFE_ATBP connected to pin 10, AFE_ATBM to pin 11
 
@@ -876,13 +876,13 @@ static bool qma6100_int_is_disabled(void)
 
 static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 {
-  uint8_t reg, reg_read;
+  uint8_t reg;
 
   qma6100_printf("%s\n", __FUNCTION__);
-  set_chip_mode(STANDBYMODE);
-  //WaitMs(1000);
 
   softwarereset();
+  WaitMs(10);
+  set_chip_mode(WAKEMODE);
 
   /*special setting*/
   justFOR6100();
@@ -895,7 +895,6 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   set_Mclk(MCLK_51KHZ);
   set_range(RANGE_4G,LPF,LPCF_AVG4,HPCF_ODRDIV10);
   set_odr(50,MCLK_51KHZ);
-  qma6100_printf("1\n");
 
   //set_anymotion(500,0,AM_SLOPE,PORT_2);
 
@@ -915,25 +914,16 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 #else
   reg = 0x23;
 #endif
-
   qma6100_write_byte(0x21, reg);
-  qma6100_printf("2\n");
+
   reg=0x85;//|0x40; // active low~INT 1-2   //1 Why 10pin can be configured, for what ?
   qma6100_write_byte(0x20, reg);// 10pin SENB dis or enable pullup resitor,SPI3-4,INT1-2 OD-PP Default Level 
-  qma6100_printf("3\n");
   WaitMs(5);
 
-  WaitMs(1000);
   get_dieID_WaferID();
-  qma6100_printf("4\n");
+  //set_chip_mode(WAKEMODE);
 
   ComparetoDefaultRegvalue();
-  qma6100_printf("5\n");
-  set_chip_mode(WAKEMODE);
-
-  qma6100_read_multi_byte(0x11,&reg_read,1);
-  qma6100_printf("finish init = 0x%x\n",reg_read);
-
   return QMA_SUCCESS;
 }
 
