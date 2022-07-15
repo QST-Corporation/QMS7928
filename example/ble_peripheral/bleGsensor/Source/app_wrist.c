@@ -396,7 +396,7 @@ uint16 appWristProcEvt( uint8 task_id, uint16 events )
           LOG("ReInit Acc %d\n", ++initCnt);
         }
         else {
-          //osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 500);
+          osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 500);
         } 
         return ( events ^ ACC_INIT_EVT);
     }

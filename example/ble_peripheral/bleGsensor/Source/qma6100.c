@@ -841,11 +841,6 @@ void justFOR6100(void)
   //qma6100_write_byte(0x50, 0x51); // 1 just for 6100
   qma6100_write_byte(0x4A, 0x20); // enable  DWA of AFE
   qma6100_write_byte(0x56, 0x01); // AFE_ATBP connected to pin 10, AFE_ATBM to pin 11
-
-#if (QMA6100_USE_IIC)
-  qma6100_write_byte(0x4A, 0x28); // enable i2c stop Spi,SENB can be used as ATB ! enable DWA of AFE
-  WaitMs(5);
-#endif
 }
 
 void get_dieID_WaferID(void)
@@ -879,22 +874,19 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   uint8_t reg;
 
   qma6100_printf("%s\n", __FUNCTION__);
-
+  set_chip_mode(WAKEMODE);
   softwarereset();
   WaitMs(10);
+
   set_chip_mode(WAKEMODE);
 
   /*special setting*/
   justFOR6100();
-  qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
-  WaitMs(1);
-  qma6100_write_byte(0x5f, 0x00);// normal mode
-  WaitMs(1);
   /*special setting end*/
 
-  set_Mclk(MCLK_51KHZ);
+  set_Mclk(MCLK_6KHZ);
   set_range(RANGE_4G,LPF,LPCF_AVG4,HPCF_ODRDIV10);
-  set_odr(50,MCLK_51KHZ);
+  set_odr(400,MCLK_6KHZ);
 
   //set_anymotion(500,0,AM_SLOPE,PORT_2);
 
@@ -922,6 +914,11 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 
   get_dieID_WaferID();
   //set_chip_mode(WAKEMODE);
+
+  qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
+  WaitMs(1);
+  qma6100_write_byte(0x5f, 0x00);// normal mode
+  WaitMs(1);
 
   ComparetoDefaultRegvalue();
   return QMA_SUCCESS;
@@ -985,9 +982,9 @@ ret_code_t qma6100_data_read(int16_t *pdata, uint8_t size)
 #endif
 
   ret = qma6100_read_multi_byte(0x01, raw, sizeof(raw));
-  *pdata = (int16_t)(raw[1]<<8) + raw[0];
-  *(pdata+1) = (int16_t)(raw[3]<<8) + raw[2];
-  *(pdata+2) = (int16_t)(raw[5]<<8) + raw[4];
+  *pdata = (int16_t)((raw[1]<<8) + raw[0])>>2;
+  *(pdata+1) = (int16_t)((raw[3]<<8) + raw[2])>>2;
+  *(pdata+2) = (int16_t)((raw[5]<<8) + raw[4])>>2;
 
 #if (QMA6100_USE_IIC)
   qma6100_i2c_deinit(p_dev->hw_if);
