@@ -54,9 +54,6 @@
 /*********************************************************************
     GLOBAL VARIABLES
 */
-#define MAX_SAMPLE_POINT    64
-uint16_t adc_debug[6][MAX_SAMPLE_POINT];
-static uint8_t channel_done_flag = 0;
 
 /*********************************************************************
     EXTERNAL VARIABLES
@@ -86,14 +83,11 @@ static uint8 adcDemo_TaskID;   // Task ID for internal task/event processing
 */
 adc_Cfg_t adc_cfg =
 {
-    .channel = ADC_BIT(ADC_CH3P_P20)|ADC_BIT(ADC_CH2P_P14)|ADC_BIT(ADC_CH3N_P15),
+	.channel = ADC_BIT(ADC_CH3P_P20)|ADC_BIT(ADC_CH2P_P14)|ADC_BIT(ADC_CH3N_P15),
     .is_continue_mode = FALSE,
     .is_differential_mode = 0x00,
     .is_high_resolution = 0x7f,
 };
-
-
-
 
 /*********************************************************************
     LOCAL FUNCTIONS
@@ -127,7 +121,6 @@ uint16 adc_ProcessEvent( uint8 task_id, uint16 events )
         if ( (pMsg = osal_msg_receive( adcDemo_TaskID )) != NULL )
         {
             adc_ProcessOSALMsg( (osal_event_hdr_t*)pMsg );
-            // Release the OSAL message
             VOID osal_msg_deallocate( pMsg );
         }
 
@@ -137,15 +130,11 @@ uint16 adc_ProcessEvent( uint8 task_id, uint16 events )
 
     if ( events & 0x20 )
     {
-        // Perform periodic heart rate task
-        //LOG("20\n");
-        //osal_start_timerEx( adcDemo_TaskID, 0x20, 2000);
         return (events ^ 0x20);
     }
 
     if ( events & adcMeasureTask_EVT )
     {
-        // Perform periodic heart rate task
         //LOG("adcMeasureTask_EVT\n");
         adcMeasureTask();
         return (events ^ adcMeasureTask_EVT);
@@ -161,109 +150,99 @@ static void adc_ProcessOSALMsg( osal_event_hdr_t* pMsg )
 
 static void adc_evt(adc_Evt_t* pev)
 {
-    float value = 0;
-    int i = 0;
-    bool is_high_resolution = FALSE;
-    bool is_differential_mode = FALSE;
-    uint8_t ch = 0;
+	float value = 0;
+	bool is_high_resolution = FALSE;
+	bool is_differential_mode = FALSE;
+	uint8_t ch = 0;
+	static uint8_t coutner = 0;
+	
+	is_high_resolution = (adc_cfg.is_high_resolution & BIT(pev->ch))?TRUE:FALSE;
+	is_differential_mode = (adc_cfg.is_differential_mode & BIT(pev->ch))?TRUE:FALSE;
+	value = hal_adc_value_cal(pev->ch,pev->data, pev->size, is_high_resolution,is_differential_mode);
 
-    if((pev->type != HAL_ADC_EVT_DATA) || (pev->ch < 2))
-        return;
+	switch(pev->ch)
+	{
+		case ADC_CH1N_P11:
+		ch=11;
+		break;
 
-    osal_memcpy(adc_debug[pev->ch-2],pev->data,2*(pev->size));
-    channel_done_flag |= BIT(pev->ch);
+		case ADC_CH1P_P23:
+		ch=23;
+		break;
 
-    if(channel_done_flag == adc_cfg.channel)
-    {
-        for(i=2; i<8; i++)
-        {
-            if(channel_done_flag & BIT(i))
-            {
-                is_high_resolution = (adc_cfg.is_high_resolution & BIT(i))?TRUE:FALSE;
-                is_differential_mode = (adc_cfg.is_differential_mode & BIT(i))?TRUE:FALSE;
-                value = hal_adc_value_cal((adc_CH_t)i,adc_debug[i-2], pev->size, is_high_resolution,is_differential_mode);
+		case ADC_CH2N_P24:
+		ch=24;
+		break;
 
-                switch(i)
-                {
-                case ADC_CH1N_P11:
-                    ch=11;
-                    break;
+		case ADC_CH2P_P14:
+		ch=14;
+		break;
 
-                case ADC_CH1P_P23:
-                    ch=23;
-                    break;
+		case ADC_CH3N_P15:
+		ch=15;
+		break;
 
-                case ADC_CH2N_P24:
-                    ch=24;
-                    break;
+		case ADC_CH3P_P20:
+		ch=20;
+		break;
 
-                case ADC_CH2P_P14:
-                    ch=14;
-                    break;
+		default:
+		break;
+	}
 
-                case ADC_CH3N_P15:
-                    ch=15;
-                    break;
-
-                case ADC_CH3P_P20:
-                    ch=20;
-                    break;
-
-                default:
-                    break;
-                }
-
-                if(ch!=0)
-                {
-                    LOG("P%d %d mv ",ch,(int)(value*1000));
-                }
-                else
-                {
-                    LOG("invalid channel\n");
-                }
-            }
-        }
-
-        LOG(" mode:%d \n",adc_cfg.is_continue_mode);
-        channel_done_flag = 0;
-
-        if(adc_cfg.is_continue_mode == FALSE)
-        {
-            osal_start_timerEx(adcDemo_TaskID, adcMeasureTask_EVT,1000);
-        }
-    }
+	if(ch!=0)
+	{
+		LOG("P%d %d mv ",ch,(int)(value*1000));
+	}
+	else
+	{
+		LOG("invalid channel\n");
+	}
+	coutner++;
+	if(coutner>=3)//adc channel enable number
+	{
+		coutner = 0;
+		LOG("\n");
+	}
+	//LOG(" mode:%d \n",adc_cfg.is_continue_mode);
 }
 
 static void adcMeasureTask( void )
 {
-    int ret;
-    bool batt_mode = TRUE;
-    uint8_t batt_ch = ADC_CH3P_P20;
-    GPIO_Pin_e pin;
+	int ret;
+	bool batt_mode = TRUE;
+	uint8_t batt_ch = ADC_CH3P_P20;
+	GPIO_Pin_e pin;
 
-    //LOG("adcMeasureTask\n");
-    if(FALSE == batt_mode)
-    {
-        ret = hal_adc_config_channel(adc_cfg, adc_evt);
-    }
-    else
-    {
-        if((((1 << batt_ch) & adc_cfg.channel) == 0) || (adc_cfg.is_differential_mode != 0x00))
-            return;
+	LOG("\nadcMeasureTask\n");
+	if(FALSE == batt_mode)
+	{
+		ret = hal_adc_config_channel(adc_cfg, adc_evt);
+	}
+	else
+	{
+		if(((BIT(batt_ch) & adc_cfg.channel) == 0) || adc_cfg.is_differential_mode)
+		{
+			LOG("Error config parameter!\n");
+			return;
+		}
+		
+		pin = s_pinmap[batt_ch];
+		hal_gpio_cfg_analog_io(pin,Bit_DISABLE);
+		hal_gpio_write(pin, 1);
+		ret = hal_adc_config_channel(adc_cfg, adc_evt);
+		hal_gpio_cfg_analog_io(pin,Bit_DISABLE);		
+	}
 
-        pin = s_pinmap[batt_ch];
-        hal_gpio_cfg_analog_io(pin,Bit_DISABLE);
-        hal_gpio_write(pin, 1);
-        ret = hal_adc_config_channel(adc_cfg, adc_evt);
-        hal_gpio_cfg_analog_io(pin,Bit_DISABLE);
-    }
-
-    if(ret)
-    {
-        LOG("ret = %d\n",ret);
-        return;
-    }
-
-    hal_adc_start();
+	if(ret)
+	{
+		LOG("ret = %d\n",ret);
+		return;
+	}
+	
+	hal_adc_start();
+	if(adc_cfg.is_continue_mode == FALSE)
+	{
+		osal_start_timerEx(adcDemo_TaskID, adcMeasureTask_EVT,1000);
+	}
 }
-
