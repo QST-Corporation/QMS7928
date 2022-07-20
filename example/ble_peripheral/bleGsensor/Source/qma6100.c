@@ -331,6 +331,15 @@ void set_chip_mode(qma6100_mode_t state)
   }
   qma6100_printf("Set mode to 0x%x\n",reg);
   qma6100_write_byte(0x11, reg);
+
+  // operate reg[0x5f] is mandatory when device was woken from standby mode.
+  if(state == WAKEMODE)
+  {
+    qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
+    WaitMs(1);
+    qma6100_write_byte(0x5f, 0x00);// normal mode
+    WaitMs(1);
+  }
 }
 
 /*
@@ -874,11 +883,11 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   uint8_t reg;
 
   qma6100_printf("%s\n", __FUNCTION__);
-  set_chip_mode(WAKEMODE);
+  qma6100_write_byte(0x11, 0x80);
   softwarereset();
   WaitMs(10);
 
-  set_chip_mode(WAKEMODE);
+  qma6100_write_byte(0x11, 0x80);
 
   /*special setting*/
   justFOR6100();
