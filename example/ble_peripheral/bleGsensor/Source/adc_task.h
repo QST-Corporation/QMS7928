@@ -3,7 +3,7 @@
     Shanghai QST Corporation confidential and proprietary.
     All rights reserved.
 
-    IMPORTANT: All rights of this software belong to Shanghai QST
+    IMPORTANT: All rights of this software belong to Shanghai QST 
     Corporation ("QST"). Your use of this Software is limited to those
     specific rights granted under  the terms of the business contract, the
     confidential agreement, the non-disclosure agreement and any other forms
@@ -30,100 +30,48 @@
 
 **************************************************************************************************/
 
-
 /**************************************************************************************************
-                                              INCLUDES
- **************************************************************************************************/
-#include "OSAL.h"
-#include "OSAL_Tasks.h"
+    Filename:       adc_task.h
+    Revised:        $Date $
+    Revision:       $Revision $
 
 
-/* HCI */
-#include "hci_tl.h"
+**************************************************************************************************/
 
-/* LL */
-#include "ll.h"
+#ifndef __ADC_TASK_H__
+#define __ADC_TASK_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-/* L2CAP */
-#include "l2cap.h"
-
-/* gap */
-#include "gap.h"
-#include "gapgattserver.h"
-#include "gapbondmgr.h"
-
-/* GATT */
-#include "gatt.h"
-
-#include "gattservapp.h"
-
-/* Profiles */
-#include "peripheral.h"
-
-/* Application */
-#include "app_wrist.h"
-#include "adc_task.h"
-
+#include "adc.h"
 /*********************************************************************
-    GLOBAL VARIABLES
+    INCLUDES
 */
 
-// The order in this table must be identical to the task initialization calls below in osalInitTask.
-const pTaskEventHandlerFn tasksArr[] =
-{
-    LL_ProcessEvent,
-    HCI_ProcessEvent,
-    L2CAP_ProcessEvent,
-    SM_ProcessEvent,
-    GAP_ProcessEvent,
-    GATT_ProcessEvent,
-    GAPRole_ProcessEvent,
-    GATTServApp_ProcessEvent,
-    appWristProcEvt,
-    adcTaskProcessEvent
-};
+/*********************************************************************
+    CONSTANTS
+*/
 
-const uint8 tasksCnt = sizeof( tasksArr ) / sizeof( tasksArr[0] );
-uint16* tasksEvents;
+/*********************************************************************
+    MACROS
+*/
+#define adcMeasureTask_EVT                            0x0080
 
 /*********************************************************************
     FUNCTIONS
- *********************************************************************/
-
-/*********************************************************************
-    @fn      osalInitTasks
-
-    @brief   This function invokes the initialization function for each task.
-
-    @param   void
-
-    @return  none
 */
-void osalInitTasks( void )
-{
-    uint8 taskID = 0;
-    tasksEvents = (uint16*)osal_mem_alloc( sizeof( uint16 ) * tasksCnt);
-    osal_memset( tasksEvents, 0, (sizeof( uint16 ) * tasksCnt));
-    /* LL Task */
-    LL_Init( taskID++ );
-    /* HCI Task */
-    HCI_Init( taskID++ );
-    /* L2CAP Task */
-    L2CAP_Init( taskID++ );
-    /* SM Task */
-    SM_Init( taskID++ );
-    /* GAP Task */
-    GAP_Init( taskID++ );
-    /* GATT Task */
-    GATT_Init( taskID++ );
-    /* Profiles */
-    GAPRole_Init( taskID++ );
-    GATTServApp_Init( taskID++ );
-    /* Application */
-    appWristInit( taskID++ );
-    adcTaskInit( taskID );
-}
+
+extern void adcTaskInit( uint8 task_id );
+extern uint16 adcTaskProcessEvent( uint8 task_id, uint16 events );
 
 /*********************************************************************
 *********************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

@@ -42,6 +42,7 @@
 #include "rf_phy_driver.h"
 #include "flash.h"
 #include "version.h"
+#include "adc.h"
 
 #define DEFAULT_UART_BAUD   115200
 
@@ -221,6 +222,7 @@ static void hal_init(void)
     hal_spif_cache_init(cfg);
     LOG_INIT();
     hal_gpio_init();
+    hal_adc_init();
 }
 
 
