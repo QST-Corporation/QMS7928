@@ -55,9 +55,7 @@
 #include "led_light.h"
 #include "qma6100.h"
 
-//#define DEF_BOARD_QST_EVK
 
-//#if 0
 #ifdef DEF_BOARD_QST_EVK
 
   #define GPIO_GREEN    P0
@@ -231,11 +229,11 @@ uint16 GPIO_Wakeup_ProcessEvent( uint8 task_id, uint16 events )
     key_Task:gpio config as key
 
 */
-static uint8 key_TaskID;
+static uint8 EvkDemo_TaskID;
 
 #define KEY_DEMO_ONCE_TIMER      0x0001
 #define KEY_DEMO_CYCLE_TIMER     0x0002
-#define ACC_DATA_EVENT           0x0004
+#define ACC_INIT_EVT             0x0004
 //#define HAL_KEY_EVENT            0x0100//assign short key event in your app event process
 
 #ifdef HAL_KEY_SUPPORT_LONG_PRESS
@@ -333,7 +331,7 @@ static void P17_wakeup_handler(void)
 void EVK_Demo_Init(uint8 task_id)
 {
     uint8_t i = 0;
-    key_TaskID = task_id;
+    EvkDemo_TaskID = task_id;
     LOG("EVK demo start...\n");
     hal_gpio_init();
     //hal_gpioretention_register(P20);
@@ -382,20 +380,20 @@ void EVK_Demo_Init(uint8 task_id)
 
 //  key_state.key[0].idle_level = HAL_LOW_IDLE;
 //  key_state.key[1].idle_level = HAL_HIGH_IDLE;
-    key_state.task_id = key_TaskID;
+    key_state.task_id = EvkDemo_TaskID;
     key_state.key_callbank = key_press_evt;
     key_init();
     light_init(led_pins,3);
-    osal_start_timerEx(key_TaskID, KEY_DEMO_ONCE_TIMER, 1000);
-    osal_start_reload_timer(key_TaskID, KEY_DEMO_CYCLE_TIMER, 1000);
+    osal_start_timerEx(EvkDemo_TaskID, KEY_DEMO_ONCE_TIMER, 1000);
+    osal_start_reload_timer(EvkDemo_TaskID, KEY_DEMO_CYCLE_TIMER, 1000);
 #ifdef DEF_BOARD_QST_EVK
-    osal_start_reload_timer(key_TaskID, ACC_DATA_EVENT, 1000);
+    osal_start_timerEx(EvkDemo_TaskID, ACC_INIT_EVT, 500);
 #endif
 }
 
 uint16 EVK_ProcessEvent( uint8 task_id, uint16 events )
 {
-    if(task_id != key_TaskID)
+    if(task_id != EvkDemo_TaskID)
     {
         return 0;
     }
@@ -403,7 +401,7 @@ uint16 EVK_ProcessEvent( uint8 task_id, uint16 events )
     if( events & KEY_DEMO_ONCE_TIMER)
     {
         //LOG("once timer\n");
-        osal_start_timerEx( key_TaskID, KEY_DEMO_ONCE_TIMER, 1000);
+        osal_start_timerEx( EvkDemo_TaskID, KEY_DEMO_ONCE_TIMER, 1000);
         return (events ^ KEY_DEMO_ONCE_TIMER);
     }
 
@@ -413,10 +411,14 @@ uint16 EVK_ProcessEvent( uint8 task_id, uint16 events )
         return (events ^ KEY_DEMO_CYCLE_TIMER);
     }
 
-    if( events & ACC_DATA_EVENT)
+    if( events & ACC_INIT_EVT)
     {
-        qma6100_demo();
-        return ( events ^ ACC_DATA_EVENT);
+        static uint16_t initCnt = 0;
+        if (qma6100_demo() != QMA_SUCCESS) {
+          osal_start_timerEx(EvkDemo_TaskID, ACC_INIT_EVT, 1000);
+          LOG("ReInit Acc %d\n", ++initCnt);
+        }
+        return ( events ^ ACC_INIT_EVT);
     }
 
     if( events & HAL_KEY_EVENT)                                                     //do not modify,key will use it

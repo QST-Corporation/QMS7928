@@ -132,10 +132,14 @@ static void qma6100_if_init(const qma6100_if_handle_t *p_if)
 
   if (p_if->pin.int1 != GPIO_DUMMY) {
     //hal_gpio_init();
+    hal_gpio_pin_init(p_if->pin.int1,IE);
+    hal_gpio_pull_set(p_if->pin.int1,PULL_DOWN);
     hal_gpioin_register(p_if->pin.int1, qma6100_int1_handler, NULL);
   }
   if (p_if->pin.int2 != GPIO_DUMMY) {
     //hal_gpio_init();
+    hal_gpio_pin_init(p_if->pin.int2,IE);
+    hal_gpio_pull_set(p_if->pin.int2,PULL_DOWN);
     hal_gpioin_register(p_if->pin.int2, qma6100_int2_handler, NULL);
   }
 }
@@ -272,6 +276,7 @@ it will compare all the resigers value with their default value.
 void ComparetoDefaultRegvalue(void)
 {
   uint8_t i,reg;
+  uint8_t cnt = 1;
   /*just for reference , some of it may be changed in anytime*/
   uint8_t reg_default_value[0x60]=
   {
@@ -297,11 +302,11 @@ void ComparetoDefaultRegvalue(void)
       if(i==0x58)
         i=0x5F;
       qma6100_read_multi_byte(i,&reg,1);
-      WaitMs(2);
+      WaitMs(1);
       if(reg!=reg_default_value[i]||i==0x33)
-      qma6100_printf("6100P Reg 0x%x= 0x%x\n",i,reg);
+      qma6100_printf("Reg[0x%02x]=0x%02x%s",i,reg,(cnt++)%2?", ":"\n");
     }
-  qma6100_printf("6100P Regvalue CMP end\n");
+  qma6100_printf("\n6100P Regvalue CMP end\n");
 }
 
 /*
@@ -326,6 +331,15 @@ void set_chip_mode(qma6100_mode_t state)
   }
   qma6100_printf("Set mode to 0x%x\n",reg);
   qma6100_write_byte(0x11, reg);
+
+  // operate reg[0x5f] is mandatory when device was woken from standby mode.
+  if(state == WAKEMODE)
+  {
+    qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
+    WaitMs(1);
+    qma6100_write_byte(0x5f, 0x00);// normal mode
+    WaitMs(1);
+  }
 }
 
 /*
@@ -750,6 +764,7 @@ void set_map_stepInt(uint8_t enable,int_port_t port)
   qma6100_write_byte(0x13, 0x7F);
   qma6100_write_byte(0x14, 0x0B);
   qma6100_write_byte(0x15, 0x0C);
+  qma6100_write_byte(0x1F, 0x09); //this is for counting animal steps from every step.
 
   if(port==PORT_1)
   {
@@ -782,12 +797,15 @@ void clear_step_cnt(void)
 
 void read_step_cnt(void)
 {
-  uint32_t stepcnt;
+  static uint32_t stepcnt = 0;
+  ret_code_t ret;
   uint8_t reg7,reg8,regd;
   qma6100_read_multi_byte(0x7,&reg7,1);
   qma6100_read_multi_byte(0x8,&reg8,1);
-  qma6100_read_multi_byte(0xd,&regd,1);
-  stepcnt = reg7|(reg8<<8)|(regd<<16);
+  ret = qma6100_read_multi_byte(0xd,&regd,1);
+  if (ret == QMA_SUCCESS) {
+    stepcnt = reg7|(reg8<<8)|(regd<<16);
+  }
   qma6100_printf("Current Stepcnt = %d \n",stepcnt);
 
   if(stepcnt>30000)
@@ -830,14 +848,9 @@ void set_map_raiseINT(uint8_t upenable,uint8_t downenable,int_port_t port)
 
 void justFOR6100(void)
 {
-  qma6100_write_byte(0x50, 0x51); // 1 just for 6100
+  //qma6100_write_byte(0x50, 0x51); // 1 just for 6100
   qma6100_write_byte(0x4A, 0x20); // enable  DWA of AFE
   qma6100_write_byte(0x56, 0x01); // AFE_ATBP connected to pin 10, AFE_ATBM to pin 11
-
-#if (QMA6100_USE_IIC)
-  qma6100_write_byte(0x4A, 0x28); // enable i2c stop Spi,SENB can be used as ATB ! enable DWA of AFE
-  WaitMs(5);
-#endif
 }
 
 void get_dieID_WaferID(void)
@@ -868,20 +881,17 @@ static bool qma6100_int_is_disabled(void)
 
 static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 {
-  uint8_t reg, reg_read;
+  uint8_t reg;
 
   qma6100_printf("%s\n", __FUNCTION__);
-  set_chip_mode(STANDBYMODE);
-  //WaitMs(1000);
-
+  qma6100_write_byte(0x11, 0x80);
   softwarereset();
+  WaitMs(10);
+
+  qma6100_write_byte(0x11, 0x80);
 
   /*special setting*/
   justFOR6100();
-  qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
-  WaitMs(1);
-  qma6100_write_byte(0x5f, 0x00);// normal mode
-  WaitMs(1);
   /*special setting end*/
 
   set_Mclk(MCLK_51KHZ);
@@ -903,9 +913,9 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 
 
 #ifdef QMA6100_USE_IIC
-  reg = 0x01; //1  INT latched bit0,spi 0x21 ,iic 0x01
+  reg = 0x03; //bit1,0  STEP INT latched,spi 0x23 ,iic 0x03
 #else
-  reg = 0x21;
+  reg = 0x23;
 #endif
 
   qma6100_write_byte(0x21, reg);
@@ -915,17 +925,15 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_printf("3\n");
   WaitMs(5);
 
-  WaitMs(1000);
   get_dieID_WaferID();
-  qma6100_printf("4\n");
+  //set_chip_mode(WAKEMODE);
 
-  //ComparetoDefaultRegvalue();
-  qma6100_printf("5\n");
-  set_chip_mode(WAKEMODE);
+  qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
+  WaitMs(1);
+  qma6100_write_byte(0x5f, 0x00);// normal mode
+  WaitMs(1);
 
-  qma6100_read_multi_byte(0x11,&reg_read,1);
-  qma6100_printf("finish init = 0x%x\n",reg_read);
-
+  ComparetoDefaultRegvalue();
   return QMA_SUCCESS;
 }
 
@@ -966,32 +974,36 @@ ret_code_t qma6100_init(qma6100_device_t* p_dev)
   return ret;
 }
 
-void qma6100_data_read(qma6100_device_t* p_dev, int16_t *pdata, uint8_t size)
+ret_code_t qma6100_data_read(int16_t *pdata, uint8_t size)
 {
+  qma6100_device_t* p_dev = get_qma6100_handle();
   uint8_t raw[6] = {0x00,};
+  ret_code_t ret = QMA_ERROR;
 
   if (size<sizeof(raw)) {
       qma6100_printf("buffer overflow, size:%d, expected:%d\n", size, sizeof(raw));
-      return;
+      return ret;
   }
 
   if (!p_dev->initialized) {
       qma6100_printf("\nInt1: QMA6100P has not been initialized.\n");
-      return;
+      return ret;
   }
 
 #if (QMA6100_USE_IIC)
   qma6100_i2c_init(p_dev->hw_if);
 #endif
 
-  qma6100_read_multi_byte(0x01, raw, sizeof(raw));
-  *pdata = (int16_t)(raw[1]<<8) + raw[0];
-  *(pdata+1) = (int16_t)(raw[3]<<8) + raw[2];
-  *(pdata+2) = (int16_t)(raw[5]<<8) + raw[4];
+  ret = qma6100_read_multi_byte(0x01, raw, sizeof(raw));
+  *pdata = (int16_t)((raw[1]<<8) + raw[0])>>2;
+  *(pdata+1) = (int16_t)((raw[3]<<8) + raw[2])>>2;
+  *(pdata+2) = (int16_t)((raw[5]<<8) + raw[4])>>2;
 
 #if (QMA6100_USE_IIC)
   qma6100_i2c_deinit(p_dev->hw_if);
 #endif
+
+  return ret;
 }
 
 static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
@@ -1004,7 +1016,7 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   qma6100_device_t* p_dev = get_qma6100_handle();
 
   if (!p_dev->initialized) {
-      qma6100_printf("\nInt1: QMA6100P has not been initialized.\n");
+      //qma6100_printf("\nInt1: QMA6100P has not been initialized.\n");
       return;
   }
 
@@ -1137,7 +1149,7 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
 #endif
 }
 
-void qma6100_demo(void)
+ret_code_t qma6100_demo(void)
 {
   qma6100_device_t* p_dev = get_qma6100_handle();
   //int16_t Acc[3] = {0x00,};
@@ -1147,13 +1159,16 @@ void qma6100_demo(void)
     qma6100_printf("\n\nQMA6100P demo\n");
     if (qma6100_init(p_dev) == QMA_SUCCESS) {
       qma6100_printf("QMA6100P is initialized!\n\n");
+      return QMA_SUCCESS;
     }
   }
   else
   {
-     //qma6100_data_read(p_dev, Acc, sizeof(Acc));
+     //qma6100_data_read(Acc, sizeof(Acc));
      //qma6100_printf("X %d, Y %d, Z %d\n", Acc[0], Acc[1], Acc[2]);
+     return QMA_SUCCESS;
   }
+  return QMA_ERROR;
 }
 
 const qma6100_if_handle_t qma6100_if_cfg = {
