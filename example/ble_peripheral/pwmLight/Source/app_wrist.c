@@ -142,9 +142,9 @@ static uint8 scanData[] =
 {
     0x12,   // length of this data
     GAP_ADTYPE_LOCAL_NAME_COMPLETE,
-    'P',
-    'h',
-    'y',
+    'Q',
+    's',
+    't',
     'L',
     'i',
     'g',
@@ -176,7 +176,7 @@ static uint8 advertData[] =
 };
 
 // Device name attribute value
-static uint8 attDeviceName[GAP_DEVICE_NAME_LEN] = "PhyLight ";
+static uint8 attDeviceName[GAP_DEVICE_NAME_LEN] = "QstLight ";
 
 // GAP connection handle
 static uint16 gapConnHandle;
