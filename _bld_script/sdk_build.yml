@@ -50,6 +50,9 @@ wrist:
 pwmLight:
 - example\ble_peripheral\pwmLight\pwmLight.uvprojx
 
+bleGsensor:
+- example\ble_peripheral\bleGsensor\bleGsensor.uvprojx
+
 ppsp_demo:
 - example\ble_peripheral\ppsp_demo\bleSmartPeripheral.uvprojx
 
