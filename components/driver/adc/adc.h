@@ -55,8 +55,7 @@ extern "C" {
 #define    MAX_ADC_SAMPLE_SIZE     32
 #define    ADC_CH_BASE             (0x40050400UL)
 
-#define    ENABLE_ADC_INT       AP_ADCC->intr_mask |= 0x000001ff
-#define    MASK_ADC_INT         AP_ADCC->intr_mask &= 0xfffffe00
+
 
 #define    CLEAR_ADC_INT(n)     AP_ADC->intr_clear |= BIT(n)
 
@@ -72,15 +71,11 @@ extern "C" {
 #define    ADC_CLOCK_DISABLE       (AP_PCRM->CLKHF_CTL1 &= ~BIT(13))
 
 
-#define ADC_USE_TIMEOUT 0
-#define ADC_OP_TIMEOUT  100
-#if(ADC_USE_TIMEOUT == 1)
-#define ADC_INIT_TOUT(to) int to = hal_systick()
-#define ADC_CHECK_TOUT(to, timeout, loginfo) {if(hal_ms_intv(to) > timeout){LOG(loginfo);return PPlus_ERR_TIMEOUT;}}
-#else
-#define ADC_INIT_TOUT(to)
-#define ADC_CHECK_TOUT(to, timeout, loginfo)
-#endif
+#define SPIF_RSVD_AREA_1                 (0x1000)
+#define pSPIF_RSVD1_ADC_CALIBRATE       ((volatile uint32_t*)(SPIF_BASE_ADDR + SPIF_RSVD_AREA_1))
+#define SPIF_RSVD1_ADC_CALIBRATE        (SPIF_BASE_ADDR + SPIF_RSVD_AREA_1)
+
+
 
 /**************************************************************************************
     @fn          hal_get_adc_int_source
@@ -139,12 +134,12 @@ extern "C" {
 typedef enum
 {
     ADC_CH0DIFF = 1,/*p18(positive),p25(negative),only works in diff*/
-    ADC_CH0 = 2,ADC_CH1N_P11 = 2,
+    ADC_CH0 = 2,ADC_CH1N_P11 = 2,MIN_ADC_CH = 2,
     ADC_CH1 = 3,ADC_CH1P_P23 = 3,ADC_CH1DIFF = 3,/*P23 and P11*/
     ADC_CH2 = 4,ADC_CH2N_P24 = 4,
     ADC_CH3 = 5,ADC_CH2P_P14 = 5,ADC_CH2DIFF = 5,/*P14 and P24*/
     ADC_CH4 = 6,ADC_CH3N_P15 = 6,
-    ADC_CH9 = 7,ADC_CH3P_P20 = 7,ADC_CH3DIFF = 7,/*P20 and P15*/
+    ADC_CH9 = 7,ADC_CH3P_P20 = 7,MAX_ADC_CH = 7,ADC_CH3DIFF = 7,/*P20 and P15*/
     ADC_CH_VOICE = 8,
     ADC_CH_NUM =9,
 } adc_CH_t;
@@ -184,13 +179,7 @@ typedef struct _adc_Evt_t
 
 typedef void (*adc_Hdl_t)(adc_Evt_t* pev);
 
-typedef struct _adc_Contex_t
-{
-    bool        enable;
-    uint8_t     all_channel;
-    bool        continue_mode;
-    adc_Hdl_t   evt_handler[ADC_CH_NUM];
-} adc_Ctx_t;
+
 
 extern gpio_pin_e s_pinmap[ADC_CH_NUM];
 /**************************************************************************************
