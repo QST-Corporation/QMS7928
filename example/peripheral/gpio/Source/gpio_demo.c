@@ -172,9 +172,9 @@ typedef struct gpioin_wakeup_t
 
 gpioin_wakeup gpiodemo[GPIO_WAKEUP_PIN_NUM] =
 {
+    GPIO_P11,posedge_callback_wakeup,negedge_callback_wakeup,
     GPIO_P14,posedge_callback_wakeup,negedge_callback_wakeup,
     GPIO_P23,posedge_callback_wakeup,negedge_callback_wakeup,
-    GPIO_P31,posedge_callback_wakeup,negedge_callback_wakeup,
 };
 
 void GPIO_Wakeup_Init(uint8 task_id )
@@ -246,16 +246,6 @@ static void key_press_evt(uint8_t i,key_evt_t key_evt)
     }
 }
 
-static void P16_wakeup_handler(void)
-{
-    hal_gpio_cfg_analog_io(P16,Bit_DISABLE);
-}
-
-static void P17_wakeup_handler(void)
-{
-    hal_gpio_cfg_analog_io(P17,Bit_DISABLE);
-}
-
 typedef struct _uart_Context
 {
     bool        enable;
@@ -270,8 +260,8 @@ void uart_port_reconfig(void)
 {
     uart_Cfg_t cfg_user =
     {
-        .tx_pin = P14,
-        .rx_pin = P15,
+        .tx_pin = P26,
+        .rx_pin = P27,
 
         .rts_pin = GPIO_DUMMY,
         .cts_pin = GPIO_DUMMY,
@@ -284,8 +274,8 @@ void uart_port_reconfig(void)
     };
     hal_gpio_fmux(P9,Bit_DISABLE);
     hal_gpio_fmux(P10,Bit_DISABLE);
-    hal_gpio_pin_init(P14,OEN);
-    hal_gpio_pin_init(P15,IE);
+    hal_gpio_pin_init(P26,OEN);
+    hal_gpio_pin_init(P27,IE);
     //m_uartCtx.enable = FALSE;
     hal_uart_init(cfg_user,UART0);//uart init
     LOG("uart new port...\n");
@@ -308,44 +298,28 @@ void Key_Demo_Init(uint8 task_id)
              P04~P07,P11~P15:default gpio,use it easily.
              P08:mode select pin,cannot used as other usage.
              P09~P10,it is uart in burn mode which cannot config.it is configable when in debug mode.
-             P16~P17:xtal pin,when use this pins,please use rc as system frequency.config hal_rtc_clock_config(CLK_32K_RCOSC) in hal_init first.
              P18~P34:wakeup is supported,but interrupt is not supported,so config it as key is not suggested.
         3.idle level,config key_state.idle_level
         4.key type,if only use press and release,ignore the long press and release code
         5.taskID and callback function
     */
-//  key_state.key[0].pin = GPIO_P14;//default gpio
-//  key_state.key[1].pin = GPIO_P15;
+    key_state.key[0].pin = GPIO_P11;//default gpio
+    key_state.key[1].pin = GPIO_P14;
 //  key_state.key[2].pin = GPIO_P00;//default jtag
 //  key_state.key[3].pin = GPIO_P01;
 //  key_state.key[4].pin = GPIO_P02;
 //  key_state.key[5].pin = GPIO_P03;
-//  key_state.key[6].pin = GPIO_P16;//default xtal
-//  key_state.key[7].pin = GPIO_P17;//default xtal
 //
 //  key_state.key[0].pin = GPIO_P09;
 //  key_state.key[1].pin = GPIO_P10;
-    key_state.key[0].pin = GPIO_P03;
-//  key_state.key[1].pin = GPIO_P15;
+//  key_state.key[0].pin = GPIO_P03;
 
     for(i = 0; i < HAL_KEY_NUM; ++i)
     {
         key_state.key[i].state = HAL_STATE_KEY_IDLE;
-        key_state.key[i].idle_level = HAL_LOW_IDLE;
+        key_state.key[i].idle_level = HAL_HIGH_IDLE;//HAL_LOW_IDLE;
 
-        if(key_state.key[i].pin == GPIO_P16)
-        {
-            hal_pwrmgr_register(MOD_USR2,NULL,P16_wakeup_handler);
-            hal_gpio_cfg_analog_io(key_state.key[i].pin,Bit_DISABLE);
-            LOG("P16 is used\n");
-        }
-        else if(key_state.key[i].pin == GPIO_P17)
-        {
-            hal_pwrmgr_register(MOD_USR3,NULL,P17_wakeup_handler);
-            hal_gpio_cfg_analog_io(key_state.key[i].pin,Bit_DISABLE);
-            LOG("P17 is used\n");
-        }
-        else if((key_state.key[i].pin == GPIO_P09) || (key_state.key[i].pin == GPIO_P10))
+        if((key_state.key[i].pin == GPIO_P09) || (key_state.key[i].pin == GPIO_P10))
         {
             uart_port_reconfig();
         }

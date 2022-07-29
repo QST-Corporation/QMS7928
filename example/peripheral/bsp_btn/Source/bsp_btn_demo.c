@@ -97,7 +97,7 @@ void hal_bsp_btn_callback(uint8_t evt)
 
 Gpio_Btn_Info gpio_btn_info =
 {
-    {P14,P15,P26},
+    {P11,P14,P26},
     hal_bsp_btn_callback,
 };
 
@@ -105,7 +105,7 @@ Gpio_Btn_Info gpio_btn_info =
 
 #if (BSP_BTN_HARDWARE_CONFIG == BSP_BTN_JUST_KSCAN)
 
-KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P25,KEY_ROW_P18};
+KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P25,KEY_ROW_P23};
 KSCAN_COLS_e cols[NUM_KEY_COLS] = {KEY_COL_P01,KEY_COL_P03,KEY_COL_P24,KEY_COL_P20};
 
 BTN_T usr_sum_btn_array[BSP_TOTAL_BTN_NUM];
@@ -188,7 +188,7 @@ void hal_kscan_btn_check(bsp_btn_callback_t cb)
 
 #if (BSP_BTN_HARDWARE_CONFIG == BSP_BTN_GPIO_AND_KSCAN)
 
-KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P25,KEY_ROW_P18};
+KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P25,KEY_ROW_P23};
 KSCAN_COLS_e cols[NUM_KEY_COLS] = {KEY_COL_P01,KEY_COL_P03,KEY_COL_P24,KEY_COL_P20};
 
 BTN_T usr_sum_btn_array[BSP_TOTAL_BTN_NUM];
@@ -269,7 +269,7 @@ void hal_kscan_btn_check(bsp_btn_callback_t cb)
 
 Gpio_Btn_Info gpio_btn_info =
 {
-    {P14,P15,P26},
+    {P11,P14,P26},
     hal_bsp_btn_callback,
 };
 #endif
