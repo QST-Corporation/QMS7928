@@ -247,6 +247,7 @@ void softwarereset(void)
   qma6100_write_byte(0x36, 0xb6);
   WaitMs(1); // delay time can be very short  , such as the time between two i2c cmd.
   qma6100_write_byte(0x36, 0x00);
+  WaitMs(10);
 
   qma6100_read_multi_byte(0x33,&reg_read,1);
   qma6100_printf("tim 0x33 = 0x%x\n",reg_read);
@@ -859,11 +860,11 @@ void get_dieID_WaferID(void)
   uint8_t waferid;
   uint8_t reg[2];
 
-  qma6100_read_multi_byte(0x4D,reg,2);
+  qma6100_read_multi_byte(0x47,reg,2);
   dieid = (reg[1]<<8)|reg[0];
   qma6100_printf("dieID=0x%x,", dieid);
   qma6100_read_multi_byte(0x5A,reg,1);
-  waferid = reg[0]&0x7F;
+  waferid = reg[0]&0x3F;
   qma6100_printf("waferID=0x%x\n", waferid);
 }
 
@@ -886,7 +887,6 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_printf("%s\n", __FUNCTION__);
   qma6100_write_byte(0x11, 0x80);
   softwarereset();
-  WaitMs(10);
 
   qma6100_write_byte(0x11, 0x80);
 
@@ -897,7 +897,6 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   set_Mclk(MCLK_51KHZ);
   set_range(RANGE_4G,LPF,LPCF_AVG4,HPCF_ODRDIV10);
   set_odr(50,MCLK_51KHZ);
-  qma6100_printf("1\n");
 
   //set_anymotion(500,0,AM_SLOPE,PORT_2);
 
@@ -917,12 +916,10 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 #else
   reg = 0x23;
 #endif
-
   qma6100_write_byte(0x21, reg);
-  qma6100_printf("2\n");
+
   reg=0x85;//|0x40; // active low~INT 1-2   //1 Why 10pin can be configured, for what ?
   qma6100_write_byte(0x20, reg);// 10pin SENB dis or enable pullup resitor,SPI3-4,INT1-2 OD-PP Default Level 
-  qma6100_printf("3\n");
   WaitMs(5);
 
   get_dieID_WaferID();

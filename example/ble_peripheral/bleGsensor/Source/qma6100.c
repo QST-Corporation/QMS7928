@@ -247,6 +247,7 @@ void softwarereset(void)
   qma6100_write_byte(0x36, 0xb6);
   WaitMs(1); // delay time can be very short  , such as the time between two i2c cmd.
   qma6100_write_byte(0x36, 0x00);
+  WaitMs(10);
 
   qma6100_read_multi_byte(0x33,&reg_read,1);
   qma6100_printf("tim 0x33 = 0x%x\n",reg_read);
@@ -858,11 +859,11 @@ void get_dieID_WaferID(void)
   uint8_t waferid;
   uint8_t reg[2];
 
-  qma6100_read_multi_byte(0x4D,reg,2);
+  qma6100_read_multi_byte(0x47,reg,2);
   dieid = (reg[1]<<8)|reg[0];
   qma6100_printf("dieID=0x%x,", dieid);
   qma6100_read_multi_byte(0x5A,reg,1);
-  waferid = reg[0]&0x7F;
+  waferid = reg[0]&0x3F;
   qma6100_printf("waferID=0x%x\n", waferid);
 }
 
@@ -885,7 +886,6 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_printf("%s\n", __FUNCTION__);
   qma6100_write_byte(0x11, 0x80);
   softwarereset();
-  WaitMs(10);
 
   qma6100_write_byte(0x11, 0x80);
 
