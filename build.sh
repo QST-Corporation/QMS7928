@@ -10,15 +10,14 @@ FW_PRJ_NAME=bleGsensor
 
 echo "=============================================================================="
 echo "                 Shanghai QST Corporation"
-echo "                  Firmware build script"
-echo "                    Author: AE team"
+echo "               QMS7928 Firmware build script"
+echo "                    Author: SiP team"
 echo "                     Version 0.0.1"
 echo "=============================================================================="
-echo "INFO: Starting to build application: $FW_PRJ_PATH/$FW_PRJ_NAME"
-##rm $SDK_PATH/$FW_PRJ_PATH/buildlog_*.txt
+# echo "INFO: Starting to build application: $FW_PRJ_PATH/$FW_PRJ_NAME"
 
-echo "INFO: Building will take a while..."
+# echo "INFO: Building will take a while..."
 cd $SDK_PATH/$FW_PRJ_PATH/
 rm buildlog_*.txt
 python sdk_build.py -b $FW_PRJ_NAME
-cat buildlog_*.txt
+

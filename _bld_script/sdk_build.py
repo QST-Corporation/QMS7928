@@ -49,6 +49,21 @@ def checkTimeCost(strIn,lastTick,prtFlg=0,logFile=None):
 
 	return tCur,tCost
 
+def printBuildLog(prjpath):
+	path = prjpath
+	st = 0
+	while(True):
+		st1 = path.find('\\',st+1)
+		if(st1<0):
+			break
+		st = st1
+	path = path[:st+1]
+	flog = open(path + '_bld.txt', 'r')
+	lines = flog.read()
+	print('\n',lines)
+	flog.close()
+	return
+
 class build:
 	def __init__(self, path, keil_path = 'C:\\Keil_v5\\UV4\\UV4.exe'):
 		global dict_yml_name
@@ -189,6 +204,8 @@ class build:
 		
 		log_list = []
 		flog = open(self.m_fold + '_bld.txt', 'r')
+		# lines = flog.read()
+		# print(lines)
 		compile_flg = False
 		while(True):
 			logstr = flog.readline()
@@ -549,11 +566,12 @@ def build_prj(param, path):
 
 
 	checkTimeCost('All Build Finished',bldT0,1,logfile)
+	printBuildLog(path+'\\'+prjitm[0])
 	return
 		
 def main(argv):
 	dict_param = get_param(argv[1:])
-	print(dict_param)
+	# print(dict_param)
 	if(dict_param == {}):
 		help()
 		return
