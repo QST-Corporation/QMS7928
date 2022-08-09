@@ -8,6 +8,8 @@ import random
 import msvcrt
 import traceback
 import yaml
+import serial
+import serial.tools.list_ports
 from datetime import datetime
 
 '''
@@ -418,7 +420,13 @@ def get_param(param):
 			phase_opt = 'build'
 			phase_param = []
 			continue
-			
+		
+		if s == '-f':
+			dict_param['flash'] = None
+			phase_opt = 'flash'
+			phase_param = []
+			continue
+		
 		if s == '-c' or s == '-clear':
 			dict_param['clear'] = None
 			phase_opt = 'clear'
@@ -432,7 +440,7 @@ def get_param(param):
 def help(prj = None):
 	print('sdk_build.py: Build QST BLE SDK')
 	print('useage:')
-	print('	sdk_build.py [-help [projectname]] [-clear] [-ver 1.1.1.b] [-path sdk_path][-list] [-b [projectname]|[all]]')
+	print('	sdk_build.py [-help [projectname]] [-clear] [-ver 1.1.1.b] [-path sdk_path][-list] [-b [projectname]|[all]] [-f [projectname]]')
 	
 def files(curr_dir, ext):
 	for i in glob.glob(os.path.join(curr_dir, ext)):
@@ -497,6 +505,36 @@ def build_single(path, blditm, logfile= None):
 	#bld.new_hex(['bin\\ota.hex','bin\\ota1.hex'])
 	ret =bld(cfg, output)
 	return ret
+
+def flash_image(path, flashitm, prjname):
+	#******export PhyPlusKit.exe path to PATH environment variable*************
+	flashtool = 'PhyPlusKit.exe'
+	path = path+'\\'+flashitm[0]
+	st = 0
+	while(True):
+		st1 = path.find('\\',st+1)
+		if(st1<0):
+			break
+		st = st1
+	path = path[:st+1]
+	abs_path = os.path.abspath(path)
+	fhex = abs_path + '\\bin\\' + prjname + '.hex'
+	fhexf = abs_path + '\\bin\\' + prjname + '_phy6222.hexf'
+	ports = list(serial.tools.list_ports.comports())
+	if len(ports) <= 0:
+		print("ERROR: Cannot find available serial port")
+		return
+	else:
+		port0 = list(ports[0])
+		com = port0[0]
+		print("INFO: Found serial port [%s]\n" % (port0[1]))
+	#merge
+	mergecmd = ' -c -p ' + fhex + ' -M NO'
+	#run flash
+	cmd = flashtool + mergecmd + ' -P ' + com + ' -R 1FFF4000' + ' -w ' + fhexf
+	# print(cmd)
+	os.system(cmd)
+	return
 
 def log_err_check(flog):
 	flog.seek(0,0)
@@ -569,6 +607,40 @@ def build_prj(param, path):
 	printBuildLog(path+'\\'+prjitm[0])
 	return
 		
+def flash_prj(param, path):
+	global dict_build_list
+	global dict_yml_name
+	if len(dict_build_list) == 0:
+		print('dict_build_list is blank.-lcfg first')
+		return
+	lprj = list(dict_build_list)
+	if(path == ''):
+		#path = 'Trunk'
+		path = '..'
+	if(path[-1] == '\\'):
+		path = path[:-1]
+	id = -1
+	if(param is None):
+		list_prj()
+		print('input id:')
+		id = int(input())
+		if(id < 0 or id >= len(lprj)):
+			print('input out of range, exiting')
+			exit()
+	elif(param[0] in lprj):
+		id = lprj.index(param[0])
+	elif(param[0] == 'all'):
+		id = -1
+	else:
+		print('Error flash parameter, exiting')
+		exit()
+
+	prjname = lprj[id]
+	prjitm = dict_build_list[prjname]
+	flash_image(path, prjitm, prjname)#, logfile)
+
+	return
+		
 def main(argv):
 	dict_param = get_param(argv[1:])
 	# print(dict_param)
@@ -625,6 +697,9 @@ def main(argv):
 			return
 	if('build' in dict_param):
 		build_prj(dict_param['build'], path)
+		return
+	if('flash' in dict_param):
+		flash_prj(dict_param['flash'], path)
 		return
 	#bld = build(argv[1])
 	#bld.build_check()
