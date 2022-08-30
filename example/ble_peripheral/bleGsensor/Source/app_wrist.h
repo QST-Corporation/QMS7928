@@ -68,9 +68,11 @@
 #define BATT_CHARGE_EVT                         0x0040  //event for battery charge status change
 #define ACC_INIT_EVT                            0x0080  //event for accelerator initialization
 #define ACC_DATA_EVT                            0x0100  //event for accelerator data change
-#define TIMER_LIGHT_EVT                         0x0200  //for led light timeout
-#define TIMER_KSCAN_DEBOUNCE_EVT                0x0400  //for keyscan debounce
-#define RESET_ADV_EVT                           0x0800  //for adv reset
+#define ACC_INT1_EVT                            0x0200  //event for accelerator int1
+#define ACC_INT2_EVT                            0x0400  //event for accelerator int2
+#define TIMER_LIGHT_EVT                         0x0800  //for led light timeout
+#define TIMER_KSCAN_DEBOUNCE_EVT                0x1000  //for keyscan debounce
+#define RESET_ADV_EVT                           0x2000  //for adv reset
 
 
 

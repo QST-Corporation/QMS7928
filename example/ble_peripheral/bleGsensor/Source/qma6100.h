@@ -253,6 +253,8 @@ typedef struct
 qma6100_device_t* get_qma6100_handle(void);
 ret_code_t qma6100_demo(qma6100_evt_hdl_t evt_hdl);
 ret_code_t qma6100_data_read(int16_t *pdata, uint8_t size);
+void qma6100_int1_handler(void);
+void qma6100_int2_handler(void);
 
 #ifdef __cplusplus
 } /* extern "C" */

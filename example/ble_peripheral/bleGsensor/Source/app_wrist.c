@@ -396,7 +396,7 @@ uint16 appWristProcEvt( uint8 task_id, uint16 events )
           LOG("ReInit Acc %d\n", ++initCnt);
         }
         else {
-          osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 500);
+          osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 2000);
         } 
         return ( events ^ ACC_INIT_EVT);
     }
@@ -408,6 +408,18 @@ uint16 appWristProcEvt( uint8 task_id, uint16 events )
           LOG("X %d, Y %d, Z %d\n", Acc[0], Acc[1], Acc[2]);
         }
         return ( events ^ ACC_DATA_EVT);
+    }
+
+    if( events & ACC_INT1_EVT)
+    {
+        qma6100_int1_handler();
+        return ( events ^ ACC_INT1_EVT);
+    }
+
+    if( events & ACC_INT2_EVT)
+    {
+        qma6100_int2_handler();
+        return ( events ^ ACC_INT2_EVT);
     }
 
     if ( events & RESET_ADV_EVT )
