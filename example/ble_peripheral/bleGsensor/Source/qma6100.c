@@ -61,6 +61,7 @@
 #include "i2c.h"
 #include "log.h"
 #include "qma6100.h"
+#include "app_wrist.h"
 
 /******************************************************
  *                      Macros
@@ -74,6 +75,7 @@
  ******************************************************/
 uint8_t SpiTxData[50] = {0,};
 uint8_t SpiRxData[50] = {0,};
+extern uint8 AppWrist_TaskID;
 
 /******************************************************
  *                 Static Variables
@@ -82,8 +84,6 @@ static uint8_t g_qmi6100p_address;
 static void* g_pi2c;
 int16_t rdata[64][3];
 /* Private function prototypes -----------------------------------------------*/
-static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type);
-static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type);
 
 #if (QMA6100_USE_IIC)
 /**
@@ -119,6 +119,20 @@ static void qma6100_spi_init(const qma6100_if_handle_t *p_if)
 }
 #endif
 
+static void qma6100_int_event(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
+{
+  qma6100_device_t* p_dev = get_qma6100_handle();
+
+  if(pin == p_dev->hw_if->pin.int1)
+  {
+      osal_set_event(AppWrist_TaskID, ACC_INT1_EVT);
+  }
+  else if(pin == p_dev->hw_if->pin.int2)
+  {
+      osal_set_event(AppWrist_TaskID, ACC_INT2_EVT);
+  }
+}
+
 static void qma6100_if_init(const qma6100_if_handle_t *p_if)
 {
 #if (QMA6100_USE_IIC)
@@ -134,13 +148,13 @@ static void qma6100_if_init(const qma6100_if_handle_t *p_if)
     //hal_gpio_init();
     hal_gpio_pin_init(p_if->pin.int1,IE);
     hal_gpio_pull_set(p_if->pin.int1,PULL_DOWN);
-    hal_gpioin_register(p_if->pin.int1, qma6100_int1_handler, NULL);
+    hal_gpioin_register(p_if->pin.int1, qma6100_int_event, NULL);
   }
   if (p_if->pin.int2 != GPIO_DUMMY) {
     //hal_gpio_init();
     hal_gpio_pin_init(p_if->pin.int2,IE);
     hal_gpio_pull_set(p_if->pin.int2,PULL_DOWN);
-    hal_gpioin_register(p_if->pin.int2, qma6100_int2_handler, NULL);
+    hal_gpioin_register(p_if->pin.int2, qma6100_int_event, NULL);
   }
 }
 
@@ -247,6 +261,7 @@ void softwarereset(void)
   qma6100_write_byte(0x36, 0xb6);
   WaitMs(1); // delay time can be very short  , such as the time between two i2c cmd.
   qma6100_write_byte(0x36, 0x00);
+  WaitMs(10);
 
   qma6100_read_multi_byte(0x33,&reg_read,1);
   qma6100_printf("tim 0x33 = 0x%x\n",reg_read);
@@ -763,7 +778,7 @@ void set_map_stepInt(uint8_t enable,int_port_t port)
   WaitMs(1);
   qma6100_write_byte(0x13, 0x7F);
   qma6100_write_byte(0x14, 0x0B);
-  qma6100_write_byte(0x15, 0x0C);
+  qma6100_write_byte(0x15, 0x0C);//0x32
   qma6100_write_byte(0x1F, 0x09); //this is for counting animal steps from every step.
 
   if(port==PORT_1)
@@ -787,33 +802,13 @@ void set_map_stepInt(uint8_t enable,int_port_t port)
 /*
  set qma6100P step count to zero ,step counter will recalculate the step from zero .
 */
-void clear_step_cnt(void)
+static void clear_step_cnt(void)
 {
   qma6100_write_byte(0x13, 0x80);
   WaitMs(1);
   qma6100_write_byte(0x13, 0x7F);
   qma6100_printf("RESET Current Stepcnt \n");
 }
-
-void read_step_cnt(void)
-{
-  static uint32_t stepcnt = 0;
-  ret_code_t ret;
-  uint8_t reg7,reg8,regd;
-  qma6100_read_multi_byte(0x7,&reg7,1);
-  qma6100_read_multi_byte(0x8,&reg8,1);
-  ret = qma6100_read_multi_byte(0xd,&regd,1);
-  if (ret == QMA_SUCCESS) {
-    stepcnt = reg7|(reg8<<8)|(regd<<16);
-  }
-  qma6100_printf("Current Stepcnt = %d \n",stepcnt);
-
-  if(stepcnt>30000)
-  {
-    //clear_step_cnt();
-  }
-}
-
 
 void set_map_raiseINT(uint8_t upenable,uint8_t downenable,int_port_t port)
 {
@@ -858,11 +853,11 @@ void get_dieID_WaferID(void)
   uint8_t waferid;
   uint8_t reg[2];
 
-  qma6100_read_multi_byte(0x4D,reg,2);
+  qma6100_read_multi_byte(0x47,reg,2);
   dieid = (reg[1]<<8)|reg[0];
   qma6100_printf("dieID=0x%x,", dieid);
   qma6100_read_multi_byte(0x5A,reg,1);
-  waferid = reg[0]&0x7F;
+  waferid = reg[0]&0x3F;
   qma6100_printf("waferID=0x%x\n", waferid);
 }
 
@@ -885,7 +880,6 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_printf("%s\n", __FUNCTION__);
   qma6100_write_byte(0x11, 0x80);
   softwarereset();
-  WaitMs(10);
 
   qma6100_write_byte(0x11, 0x80);
 
@@ -911,9 +905,9 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 
 
 #ifdef QMA6100_USE_IIC
-  reg = 0x03; //bit1,0  STEP INT latched,spi 0x23 ,iic 0x03
+  reg = 0x01; //bit0  STEP INT in non-latch mode, INT latched,spi 0x21 ,iic 0x01
 #else
-  reg = 0x23;
+  reg = 0x21;
 #endif
   qma6100_write_byte(0x21, reg);
 
@@ -1002,7 +996,7 @@ ret_code_t qma6100_data_read(int16_t *pdata, uint8_t size)
   return ret;
 }
 
-static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
+void qma6100_int1_handler(void)
 {
   uint8_t rawdata[192*2]; //6*32
   uint8_t int_status[3];
@@ -1040,22 +1034,22 @@ static void qma6100_int1_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
   }
 
 #if (QMA6100_USE_IIC)
-  //qma6100_i2c_deinit(p_dev->hw_if);
+  qma6100_i2c_deinit(p_dev->hw_if);
 #endif
 }
 
-static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
+void qma6100_int2_handler(void)
 {
-  uint8_t rawdata[384*2];	//2*32*12
-  uint8_t rawdatass[8]={1,1,1,1,1,1,1,1};
-  //int16_t Xvalue,Yvalue,Zvalue;
+  uint8_t int_status[6]={0,};
+  uint8_t raw[6]={0,};
   uint16_t i,j =0;
-  uint8_t reg;
+  uint8_t reg, ret;
   uint8_t cnt1=0;
   uint8_t cntforint;
   uint16_t readbytes;
   uint8_t nbytes=0;
   static uint16_t int2cnt = 0;
+  static uint32_t step_cnt = 0;
   qma6100_device_t* p_dev = get_qma6100_handle();
 
   if (!p_dev->initialized) {
@@ -1068,35 +1062,46 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
 #endif
 
   int2cnt++;
-  // check x y z enabled-axis //
-  qma6100_read_multi_byte(0x3E, &reg,1);
-  reg = reg&0x07;
-  if((reg&0x01)==0x01)
-    nbytes+=1;
-  if((reg&0x02)==0x02)
-    nbytes+=1;
-  if((reg&0x04)==0x04)
-    nbytes+=1;
-  // fifo-read-bytes  0~6 bytes
 
-  qma6100_read_multi_byte(0x09, rawdatass,6);
-  qma6100_printf("Int2 cnt=%d,State[0x%x,0x%x,0x%x],framecnt=%d\n",int2cnt,rawdatass[0],rawdatass[1],rawdatass[2],rawdatass[5]);
+  qma6100_read_multi_byte(0x09, int_status,6);
+  //qma6100_printf("Int2 cnt=%d,State[0x%x,0x%x,0x%x],framecnt=%d\n",int2cnt,int_status[0],int_status[1],int_status[2],int_status[5]);
 
-  if((rawdatass[1]&0x08)==0x08)
+  if((int_status[1]&0x08)==0x08) //STEP_INT
   {
-    read_step_cnt();
+    ret = qma6100_read_multi_byte(0x07, raw, 2);
+    if(ret == QMA_SUCCESS) {
+      step_cnt = raw[0]|(raw[1]<<8)|int_status[4];
+      qma6100_printf("Int%d: stepCnt=%d\n",int2cnt, step_cnt);
+    }
+
+    if(step_cnt>30000)
+    {
+      //clear_step_cnt();
+    }
   }
-  else if((rawdatass[2]&0x10)==0x10)
+  else if((int_status[2]&0x10)==0x10)
   {
-    qma6100_read_multi_byte(0x1,rawdata,6);// equals to qma6100_read_multi_byte(0x3f,rawdata,6);
-    rdata[0][0] = (int16_t)(((unsigned short)rawdata[1]<<8) + (unsigned short)rawdata[0])>>2;
-    rdata[0][1] = (int16_t)(((unsigned short)rawdata[3]<<8) + (unsigned short)rawdata[2])>>2;
-    rdata[0][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4])>>2;
+    qma6100_read_multi_byte(0x1,raw,6);// equals to qma6100_read_multi_byte(0x3f,raw,6);
+    rdata[0][0] = (int16_t)(((unsigned short)raw[1]<<8) + (unsigned short)raw[0])>>2;
+    rdata[0][1] = (int16_t)(((unsigned short)raw[3]<<8) + (unsigned short)raw[2])>>2;
+    rdata[0][2] = (int16_t)(((unsigned short)raw[5]<<8) + (unsigned short)raw[4])>>2;
     qma6100_printf("Port2:%d: %5d, %5d, %5d\n",int2cnt,rdata[0][0],rdata[0][1],rdata[0][2]);
   }
-  else if((rawdatass[2]&0x60)!=0x0)
+  else if((int_status[2]&0x60)!=0x0)
   {
-    cntforint = rawdatass[5];
+    uint8_t rawdata[384*2]; //2*32*12
+    cntforint = int_status[5];
+
+    // check x y z enabled-axis //
+    qma6100_read_multi_byte(0x3E, &reg,1);
+    reg = reg&0x07;
+    if((reg&0x01)==0x01)
+      nbytes+=1;
+    if((reg&0x02)==0x02)
+      nbytes+=1;
+    if((reg&0x04)==0x04)
+      nbytes+=1;
+    // fifo-read-bytes  0~6 bytes
 
     readbytes=nbytes*2*cntforint;//6*cntforint;
 
@@ -1117,16 +1122,10 @@ static void qma6100_int2_handler(GPIO_Pin_e pin,IO_Wakeup_Pol_e type)
 
     for(i=0;i<(cntforint);i++)//(cnt+cnt1)/6
     {
-#if 1
       for(j=0;j<nbytes;j++)
       rdata[i][j] = (int16_t)(((unsigned short)rawdata[(1+j*2)+nbytes*2*i]<<8) + (unsigned short)rawdata[(0+j*2)+nbytes*2*i]);
       //rdata[i][1] = (int16_t)(((unsigned short)rawdata[3+nbytes*2*i]<<8) + (unsigned short)rawdata[2+nbytes*2*i]);
-      //rdata[i][2] = (int16_t)(((unsigned short)rawdata[5+nbytes*2*i]<<8) + (unsigned short)rawdata[4+nbytes*2*i]);	
-#else
-      rdata[i][0] = (int16_t)(((unsigned short)rawdata[1]<<8) + (unsigned short)rawdata[0]);
-      rdata[i][1] = (int16_t)(((unsigned short)rawdata[3]<<8) + (unsigned short)rawdata[2]);
-      rdata[i][2] = (int16_t)(((unsigned short)rawdata[5]<<8) + (unsigned short)rawdata[4]);	
-#endif	
+      //rdata[i][2] = (int16_t)(((unsigned short)rawdata[5+nbytes*2*i]<<8) + (unsigned short)rawdata[4+nbytes*2*i]);
     }
     for(i=0;i<(cntforint);i++)
     {

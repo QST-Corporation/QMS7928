@@ -47,7 +47,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>qst_evk_demo</OutputName>
+          <OutputName>qst_evk</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -80,8 +80,8 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
-            <UserProg1Name>fromelf.exe --bin -o  ./bin  ./Objects/qst_evk_demo.axf</UserProg1Name>
-            <UserProg2Name>fromelf.exe .\Objects\qst_evk_demo.axf --i32combined --output .\bin\qst_evk_demo.hex</UserProg2Name>
+            <UserProg1Name>fromelf.exe --bin -o  ./bin  ./Objects/qst_evk.axf</UserProg1Name>
+            <UserProg2Name>fromelf.exe .\Objects\qst_evk.axf --i32combined --output .\bin\qst_evk.hex</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
           </AfterMake>

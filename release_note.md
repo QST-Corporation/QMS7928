@@ -1,14 +1,31 @@
-# SKD Release Notes
+# QMS7928 SDK Release Notes
 
-## ChipSet
-
-***QMS7928***
-
----
 
 ## SDK Version
 
 ***QMS7928_SDK_1.X.X***
+
+---
+
+### **Version**: QMS7928_SDK_1.0.2
+
+### **Change List**
+
+### **[components]**
+    driver:
+        gpio         : update gpio as per QMS7928 spec
+
+### **[example]**
+    bleGsensor      : 1. update step count function
+                      2. fix the i2c deinit/init failed issue
+                      3. fix gsensor driver incorrect dieID and waferID issue
+    qst_evk         : fix gsensor driver incorrect dieID and waferID issue
+
+### **[lib]**
+
+### **[misc]**
+    build script    : update to support build log print
+    flash script    : add firmware download script
 
 ---
 

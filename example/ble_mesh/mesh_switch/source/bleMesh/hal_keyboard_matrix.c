@@ -114,13 +114,8 @@ static uint8 key_hold_num=0;
 /*********************************************************************
     LOCAL VARIABLES
 */
-#if 0 //32pin
-KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P15,KEY_ROW_P18};
-KSCAN_COLS_e cols[NUM_KEY_COLS] = {KEY_COL_P01,KEY_COL_P03,KEY_COL_P24,KEY_COL_P31};
-#else //48 pin
-KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P25,KEY_ROW_P18};
-KSCAN_COLS_e cols[NUM_KEY_COLS] = {KEY_COL_P01,KEY_COL_P03,KEY_COL_P24,KEY_COL_P20};
-#endif
+KSCAN_ROWS_e rows[NUM_KEY_ROWS] = {KEY_ROW_P00,KEY_ROW_P02,KEY_ROW_P11,KEY_ROW_P25};
+KSCAN_COLS_e cols[NUM_KEY_COLS] = {KEY_COL_P01,KEY_COL_P03,KEY_COL_P14,KEY_COL_P24};
 
 /*  ------------------------------------------------------------------------------------------
     const static uint8_t KSCAN_ROW_GPIO[16] = {0,2,5,7,10,12,15,18,19,22,23,25,27,29,32,34};
@@ -129,13 +124,8 @@ KSCAN_COLS_e cols[NUM_KEY_COLS] = {KEY_COL_P01,KEY_COL_P03,KEY_COL_P24,KEY_COL_P
     const static uint8_t KSCAN_COL_MK[18] = {0,1,9,10,4,11,12,2,16,17,5,13,3,14,8,15,7,6};
     -------------------------------------------------------------------------------------------*/
 
-#if 0//32pin
-uint8 KscanMK_row[16]= {0,1,2,0XFF,0XFF,3,0xFF,0xFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF};
-uint8 KscanMK_col[18]= {0,1,0XFF,2,0XFF,0XFF,0XFF,3,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF};
-#else //48 pin
-uint8 KscanMK_row[16]= {0,1,0XFF,2,0XFF,3,0xFF,0xFF,0XFF,0XFF,0XFF,0xff,0XFF,0XFF,0XFF,0XFF};
-uint8 KscanMK_col[18]= {0,1,0XFF,2,0XFF,3,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF};
-#endif
+uint8 KscanMK_row[16]= {0,1,2,3,0XFF,0xFF,0xFF,0xFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF};
+uint8 KscanMK_col[18]= {0,1,2,3,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF};
 
 
 

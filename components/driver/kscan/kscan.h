@@ -56,22 +56,18 @@ extern "C" {
 //#define       MULTI_KEY_READ_ADDR     0x4000d0CCUL//0x400240CCUL
 
 
-const static uint8_t KSCAN_ROW_GPIO[11] =
+const static uint8_t KSCAN_ROW_GPIO[7] =
 {
     P0,
     P2,
-    P15,
+    P11,
     P25,
     P10,
-    P18,
     P23,
-    P32,
-    P34,
     P27,
-    P7,
 };
 
-const static uint8_t KSCAN_COL_GPIO[12] =
+const static uint8_t KSCAN_COL_GPIO[7] =
 {
     P1,
     P3,
@@ -79,12 +75,7 @@ const static uint8_t KSCAN_COL_GPIO[12] =
     P24,
     P9,
     P20,
-    P33,
-    P31,
     P26,
-    P17,
-    P16,
-    P11,
 };
 
 #define NUM_KEY_ROWS   4
@@ -93,8 +84,8 @@ const static uint8_t KSCAN_COL_GPIO[12] =
 #define MAX_KEY_ROWS    (sizeof(KSCAN_ROW_GPIO)/sizeof(uint8_t))
 #define MAX_KEY_COLS    (sizeof(KSCAN_COL_GPIO)/sizeof(uint8_t))
 
-#define KSCAN_ALL_ROW_NUM 11
-#define KSCAN_ALL_COL_NUM 12
+#define KSCAN_ALL_ROW_NUM 7
+#define KSCAN_ALL_COL_NUM 7
 /*************************************************************
     @brief      enum variable used for setting rows
 
@@ -103,15 +94,11 @@ typedef enum
 {
     KEY_ROW_P00   =   0,
     KEY_ROW_P02   =   1,
-    KEY_ROW_P15   =   2,
+    KEY_ROW_P11   =   2,
     KEY_ROW_P25   =   3,
     KEY_ROW_P10   =   4,
-    KEY_ROW_P18   =   5,
-    KEY_ROW_P23   =   6,
-    KEY_ROW_P32   =   7,
-    KEY_ROW_P34   =   8,
-    KEY_ROW_P27   =   9,
-    KEY_ROW_P07   =   10,
+    KEY_ROW_P23   =   5,
+    KEY_ROW_P27   =   6,
 
 } KSCAN_ROWS_e;
 
@@ -127,12 +114,7 @@ typedef enum
     KEY_COL_P24   =   3,
     KEY_COL_P09   =   4,
     KEY_COL_P20   =   5,
-    KEY_COL_P33   =   6,
-    KEY_COL_P31   =   7,
-    KEY_COL_P26   =   8,
-    //KEY_COL_P17   =   9,
-    //KEY_COL_P16   =   10,
-    KEY_COL_P11   =   11,
+    KEY_COL_P26   =   6,
 
 } KSCAN_COLS_e;
 
