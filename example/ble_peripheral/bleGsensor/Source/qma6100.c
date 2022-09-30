@@ -889,7 +889,7 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 
   set_Mclk(MCLK_6KHZ);
   set_range(RANGE_4G,LPF,LPCF_AVG4,HPCF_ODRDIV10);
-  set_odr(400,MCLK_6KHZ);
+  set_odr(800,MCLK_6KHZ);
 
   //set_anymotion(500,0,AM_SLOPE,PORT_2);
 
@@ -914,6 +914,9 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   reg=0x85;//|0x40; // active low~INT 1-2   //1 Why 10pin can be configured, for what ?
   qma6100_write_byte(0x20, reg);// 10pin SENB dis or enable pullup resitor,SPI3-4,INT1-2 OD-PP Default Level 
   WaitMs(5);
+
+  qma6100_write_byte(0x46, 0x0f); // ultra low power(<4uA) setting
+  qma6100_printf("QMA6100P ultra low power setting: reg[0x46]=0x0f\n");
 
   get_dieID_WaferID();
   //set_chip_mode(WAKEMODE);
