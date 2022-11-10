@@ -7,6 +7,21 @@
 
 ---
 
+### **Version**: QMS7928_SDK_1.0.3
+
+### **Change List**
+
+### **[components]**
+### **[example]**
+    bleGsensor      : update gsensor driver to support ultra low power mode.(gsensor current < 4uA)
+
+
+### **[lib]**
+
+### **[misc]**
+
+---
+
 ### **Version**: QMS7928_SDK_1.0.2
 
 ### **Change List**
