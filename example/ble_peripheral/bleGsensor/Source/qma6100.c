@@ -881,7 +881,7 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_write_byte(0x11, 0x80);
   softwarereset();
 
-  qma6100_write_byte(0x11, 0x80);
+  // qma6100_write_byte(0x11, 0x80);
 
   /*special setting*/
   justFOR6100();
@@ -919,12 +919,7 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_printf("QMA6100P ultra low power setting: reg[0x46]=0x0f\n");
 
   get_dieID_WaferID();
-  //set_chip_mode(WAKEMODE);
-
-  qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
-  WaitMs(1);
-  qma6100_write_byte(0x5f, 0x00);// normal mode
-  WaitMs(1);
+  set_chip_mode(WAKEMODE);
 
   ComparetoDefaultRegvalue();
   return QMA_SUCCESS;
