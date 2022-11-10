@@ -393,10 +393,10 @@ uint16 appWristProcEvt( uint8 task_id, uint16 events )
         static uint16_t initCnt = 0;
         if (qma6100_demo(acc_event_handler) != QMA_SUCCESS) {
           osal_start_timerEx(AppWrist_TaskID, ACC_INIT_EVT, 1000);
-          LOG("ReInit Acc %d\n", ++initCnt);
+          // LOG("ReInit Acc %d\n", ++initCnt);
         }
         else {
-          osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 2000);
+          // osal_start_reload_timer(AppWrist_TaskID, ACC_DATA_EVT, 2000);
         } 
         return ( events ^ ACC_INIT_EVT);
     }
@@ -538,8 +538,8 @@ static void WristGapStateCB( gaprole_States_t newState )
         GAPRole_SetParameter( GAPROLE_SCAN_RSP_DATA, sizeof ( scanData ), scanData );
         // Set the GAP Characteristics
         GGS_SetParameter( GGS_DEVICE_NAME_ATT, GAP_DEVICE_NAME_LEN, attDeviceName );
-        GAPRole_SetParameter( GAPROLE_ADVERT_ENABLED, sizeof( uint8 ), &initial_advertising_enable );
-        osal_set_event(AppWrist_TaskID, RESET_ADV_EVT);
+        // GAPRole_SetParameter( GAPROLE_ADVERT_ENABLED, sizeof( uint8 ), &initial_advertising_enable );
+        // osal_set_event(AppWrist_TaskID, RESET_ADV_EVT);
     }
 
     gapProfileState = newState;

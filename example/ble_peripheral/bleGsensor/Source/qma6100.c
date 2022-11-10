@@ -881,7 +881,7 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_write_byte(0x11, 0x80);
   softwarereset();
 
-  qma6100_write_byte(0x11, 0x80);
+  // qma6100_write_byte(0x11, 0x80);
 
   /*special setting*/
   justFOR6100();
@@ -889,7 +889,7 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
 
   set_Mclk(MCLK_6KHZ);
   set_range(RANGE_4G,LPF,LPCF_AVG4,HPCF_ODRDIV10);
-  set_odr(400,MCLK_6KHZ);
+  set_odr(800,MCLK_6KHZ);
 
   //set_anymotion(500,0,AM_SLOPE,PORT_2);
 
@@ -915,13 +915,11 @@ static ret_code_t qma6100p_reg_init(const qma6100_if_handle_t* p_if)
   qma6100_write_byte(0x20, reg);// 10pin SENB dis or enable pullup resitor,SPI3-4,INT1-2 OD-PP Default Level 
   WaitMs(5);
 
-  get_dieID_WaferID();
-  //set_chip_mode(WAKEMODE);
+  qma6100_write_byte(0x46, 0x0f); // ultra low power(<4uA) setting
+  qma6100_printf("QMA6100P ultra low power setting: reg[0x46]=0x0f\n");
 
-  qma6100_write_byte(0x5f, 0x80);// enable testmode ,take control FSM
-  WaitMs(1);
-  qma6100_write_byte(0x5f, 0x00);// normal mode
-  WaitMs(1);
+  get_dieID_WaferID();
+  set_chip_mode(WAKEMODE);
 
   ComparetoDefaultRegvalue();
   return QMA_SUCCESS;
