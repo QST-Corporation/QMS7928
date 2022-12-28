@@ -7,6 +7,21 @@
 
 ---
 
+### **Version**: QMS7928_SDK_1.0.4
+
+### **Change List**
+
+### **[components]**
+### **[example]**
+    bleGsensor      : fix the issue of adv was disabled.
+
+
+### **[lib]**
+
+### **[misc]**
+
+---
+
 ### **Version**: QMS7928_SDK_1.0.3
 
 ### **Change List**

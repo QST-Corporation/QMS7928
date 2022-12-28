@@ -38,10 +38,10 @@
  * @id      $Id$
  * @brief   This file provides the functions for QST QMA6100 sensor evaluation.
  *
- *          |--LE5010---|--QMA6100-|
+ *          |--QMS7928--|--QMA6100-|
  *          |----------------------|
- *          |---PB02----|--SCx_SCL-|
- *          |---PB03----|-SDx_SDA--|
+ *          |---P23 ----|--SCx_SCL-|
+ *          |---P26 ----|-SDx_SDA--|
  *          |-----NC----|---AD0----|
  *          |---+3.3V---|---VDD----|
  *          |---+3.3V---|--VDDIO---|
